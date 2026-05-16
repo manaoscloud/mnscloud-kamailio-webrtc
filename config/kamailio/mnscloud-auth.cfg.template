@@ -1,0 +1,15 @@
+loadmodule "auth.so"
+loadmodule "auth_db.so"
+
+# Authentication is intentionally API/control-plane driven in the product
+# roadmap. This initial template rejects unauthenticated public traffic unless
+# it is generated from a synchronized MNSCloud configuration.
+route[MNSCLOUD_AUTH] {
+    if ($fd == $null || $fU == $null) {
+        sl_send_reply("403", "Missing WebRTC identity");
+        exit;
+    }
+    # Full implementation must authenticate by username + realm/domain.
+    # Never authenticate by extension username alone.
+}
+

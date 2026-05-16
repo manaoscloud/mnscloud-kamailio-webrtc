@@ -1,0 +1,10 @@
+[rtpengine]
+interface=0.0.0.0
+listen-ng=127.0.0.1:2223
+port-min=30000
+port-max=40000
+log-level=6
+delete-delay=0
+timeout=60
+silent-timeout=3600
+

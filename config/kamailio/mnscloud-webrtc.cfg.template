@@ -1,0 +1,28 @@
+loadmodule "xhttp.so"
+loadmodule "websocket.so"
+loadmodule "nathelper.so"
+loadmodule "path.so"
+
+modparam("websocket", "keepalive_mechanism", 1)
+modparam("websocket", "keepalive_timeout", 30)
+modparam("nathelper", "natping_interval", 30)
+
+event_route[xhttp:request] {
+    if ($hu =~ "^/ws") {
+        set_reply_close();
+        set_reply_no_connect();
+        if (ws_handle_handshake()) {
+            exit;
+        }
+    }
+    xhttp_reply("404", "Not Found", "text/plain", "not found\n");
+}
+
+route[MNSCLOUD_WEBSOCKET] {
+    if (proto == WS || proto == WSS) {
+        force_rport();
+        if (is_method("REGISTER")) {
+            add_path();
+        }
+    }
+}

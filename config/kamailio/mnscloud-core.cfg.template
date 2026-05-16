@@ -1,0 +1,30 @@
+loadmodule "sl.so"
+loadmodule "tm.so"
+loadmodule "rr.so"
+loadmodule "maxfwd.so"
+loadmodule "textops.so"
+loadmodule "siputils.so"
+loadmodule "xlog.so"
+loadmodule "pv.so"
+loadmodule "kex.so"
+loadmodule "corex.so"
+loadmodule "ctl.so"
+loadmodule "jsonrpcs.so"
+loadmodule "htable.so"
+loadmodule "dispatcher.so"
+
+modparam("dispatcher", "list_file", "/etc/kamailio/mnscloud/dispatcher.list")
+modparam("dispatcher", "flags", 2)
+
+route[MNSCLOUD_ROUTE] {
+    if (!ds_select_dst("1", "4")) {
+        sl_send_reply("404", "No PABX target");
+        exit;
+    }
+    record_route();
+    if (!t_relay()) {
+        sl_reply_error();
+    }
+    exit;
+}
+

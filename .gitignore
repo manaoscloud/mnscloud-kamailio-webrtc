@@ -1,0 +1,10 @@
+.DS_Store
+*.log
+*.tmp
+*.swp
+.env
+node.token
+config.json
+domains.json
+routes.json
+

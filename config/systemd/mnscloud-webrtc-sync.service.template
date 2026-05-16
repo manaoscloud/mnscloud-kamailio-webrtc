@@ -1,0 +1,16 @@
+[Unit]
+Description=MNSCloud WebRTC Edge configuration sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/mnscloud/kamailio-webrtc/scripts/update-kamailio-webrtc.sh
+User=root
+Group=root
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadWritePaths=/etc/mnscloud/kamailio-webrtc /etc/kamailio /var/lib/mnscloud/kamailio-webrtc /var/log/mnscloud/kamailio-webrtc
+

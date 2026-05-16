@@ -1,0 +1,6 @@
+# Generated dispatcher entries are expected at:
+# /etc/kamailio/mnscloud/dispatcher.list
+#
+# Routing must resolve the canonical identity:
+# extension@domain -> tenant -> PABX target.
+
