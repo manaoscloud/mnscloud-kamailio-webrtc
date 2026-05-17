@@ -41,3 +41,11 @@ bash -n scripts/uninstall-kamailio-webrtc.sh
 
 Commit and push completed changes to the corresponding GitHub repository.
 
+
+## Contribution Governance
+
+- External contributions must be submitted through Pull Requests.
+- Follow `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, and this `SKILL.md` before proposing changes.
+- Do not add secrets, customer data, private infrastructure details, production domains/IPs, or hidden bypass logic.
+- MNSCloud may choose to pay, sponsor, contract, or hire contributors when work demonstrates strong value, but paid work requires explicit written agreement and is never implied by opening a Pull Request.
+- Keep security-sensitive decisions, tenant scope, billing, authorization, routing ownership, and secret resolution in the MNSCloud API/control plane.
