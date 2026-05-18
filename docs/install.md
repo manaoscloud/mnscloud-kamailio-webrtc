@@ -12,6 +12,10 @@ rtpengine. Kamailio is installed from the official Kamailio 6.1 APT repository
 for Debian `bookworm` or `trixie`, with APT pinning so Kamailio packages are not
 silently mixed with older distribution packages.
 
+APT package installation runs in non-interactive mode and keeps existing local
+configuration files when Debian package prompts appear. The installer writes the
+MNSCloud Kamailio configuration after package installation.
+
 Run:
 
 ```bash

@@ -24,9 +24,16 @@ require_supported_os() {
 
 install_base_packages() {
   run apt-get update -y
-  run apt-get install -y --no-install-recommends \
+  apt_install \
     ca-certificates curl gnupg lsb-release jq uuid-runtime \
     nginx openssl dnsutils netcat-openbsd
+}
+
+apt_install() {
+  DEBIAN_FRONTEND=noninteractive run apt-get install -y --no-install-recommends \
+    -o Dpkg::Options::=--force-confdef \
+    -o Dpkg::Options::=--force-confold \
+    "$@"
 }
 
 install_kamailio_repository() {

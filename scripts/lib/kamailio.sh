@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 install_kamailio() {
   install_kamailio_repository
-  run apt-get install -y --no-install-recommends \
+  apt_install \
     kamailio kamailio-websocket-modules kamailio-tls-modules \
     kamailio-json-modules kamailio-utils-modules kamailio-extra-modules \
     kamailio-outbound-modules kamailio-presence-modules
