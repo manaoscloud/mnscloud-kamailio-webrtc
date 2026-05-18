@@ -60,11 +60,10 @@ prompt_default() {
   printf '%s' "${value:-$default}"
 }
 
-prompt_secret_optional() {
+prompt_optional() {
   local prompt="$1"
   local value
-  read -r -s -p "$prompt: " value
-  printf '\n' >&2
+  read -r -p "$prompt: " value
   printf '%s' "$value"
 }
 

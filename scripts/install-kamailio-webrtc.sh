@@ -26,7 +26,7 @@ main() {
   local api_base server_name node_token_value
   api_base="$(prompt_default "MNSCloud API base URL" "https://api.example.com")"
   server_name="$(prompt_default "WebRTC edge public domain" "webrtc.example.com")"
-  node_token_value="$(prompt_secret_optional "WebRTC node token generated in MNSCloud (leave empty to validate later)")"
+  node_token_value="$(prompt_optional "WebRTC node token generated in MNSCloud (leave empty to validate later)")"
 
   save_api_base "$api_base"
   save_node_token "$node_token_value"
