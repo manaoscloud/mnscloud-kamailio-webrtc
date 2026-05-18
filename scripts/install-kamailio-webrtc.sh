@@ -26,7 +26,7 @@ main() {
   local api_base server_name node_token_value
   api_base="$(prompt_default "MNSCloud API base URL" "https://api.example.com")"
   server_name="$(prompt_default "WebRTC edge public domain" "webrtc.example.com")"
-  node_token_value="$(prompt_optional "WebRTC node token generated in MNSCloud (leave empty to validate later)")"
+  node_token_value="$(prompt_optional "WebRTC node token generated in MNSCloud (leave empty to validate token later)")"
 
   save_api_base "$api_base"
   save_node_token "$node_token_value"
@@ -34,6 +34,7 @@ main() {
   REPO_DIR="$INSTALL_DIR"
 
   install_base_packages
+  validate_edge_registration "kamailio"
   install_kamailio
   install_rtpengine
 
@@ -45,7 +46,7 @@ main() {
   if [[ -s "$CONFIG_DIR/node.token" ]]; then
     bootstrap_edge_node "$server_name"
   else
-    warn "Node token was not provided; skipping MNSCloud API validation during install."
+    warn "Node token was not provided; skipping token validation during install."
   fi
 
   validate_nginx

@@ -44,6 +44,57 @@ fetch_edge_config() {
   jq type "$output" >/dev/null
 }
 
+validate_edge_registration() {
+  local engine="${1:-kamailio}"
+  local base uuid token output payload status
+  base="$(api_base)"
+  uuid="$(node_uuid)"
+  token=""
+  [[ -s "$CONFIG_DIR/node.token" ]] && token="$(node_token)"
+  output="$(mktemp)"
+  payload="$(mktemp)"
+  jq -n \
+    --arg node_uuid "$uuid" \
+    --arg engine "$engine" \
+    '{node_uuid:$node_uuid, engine:$engine}' > "$payload"
+
+  if [[ -n "$token" ]]; then
+    status="$(curl -sS -o "$output" -w "%{http_code}" \
+      -X POST \
+      -H "Authorization: Bearer $token" \
+      -H "X-WebRTC-Node-UUID: $uuid" \
+      -H "X-WebRTC-Engine: $engine" \
+      -H "Content-Type: application/json" \
+      --data @"$payload" \
+      "$base/api/v1/webrtc/edge/validate" || true)"
+  else
+    status="$(curl -sS -o "$output" -w "%{http_code}" \
+      -X POST \
+      -H "X-WebRTC-Node-UUID: $uuid" \
+      -H "X-WebRTC-Engine: $engine" \
+      -H "Content-Type: application/json" \
+      --data @"$payload" \
+      "$base/api/v1/webrtc/edge/validate" || true)"
+  fi
+
+  if [[ "$status" != 2* ]]; then
+    warn "MNSCloud WebRTC edge validation failed."
+    jq -r '.error // .message // .' "$output" 2>/dev/null || cat "$output" >&2
+    rm -f "$output" "$payload"
+    die "Register this node UUID in MNSCloud with engine '$engine' and use a valid token before continuing."
+  fi
+
+  jq -e '.status == "success" and .data.registered == true' "$output" >/dev/null
+  if [[ -n "$token" ]]; then
+    jq -e '.data.tokenValidated == true' "$output" >/dev/null ||
+      die "WebRTC node token was not validated by MNSCloud."
+    ok "WebRTC edge node UUID, engine, and token validated against MNSCloud API."
+  else
+    ok "WebRTC edge node UUID and engine validated against MNSCloud API."
+  fi
+  rm -f "$output" "$payload"
+}
+
 bootstrap_edge_node() {
   local base token uuid hostname public_domain output payload
   base="$(api_base)"
@@ -55,14 +106,16 @@ bootstrap_edge_node() {
   payload="$(mktemp)"
   jq -n \
     --arg node_uuid "$uuid" \
+    --arg engine "kamailio" \
     --arg hostname "$hostname" \
     --arg publicDomain "$public_domain" \
-    '{node_uuid:$node_uuid, hostname:$hostname, publicDomain:$publicDomain}' > "$payload"
+    '{node_uuid:$node_uuid, engine:$engine, hostname:$hostname, publicDomain:$publicDomain}' > "$payload"
 
   run curl -fsSL \
     -X POST \
     -H "Authorization: Bearer $token" \
     -H "X-WebRTC-Node-UUID: $uuid" \
+    -H "X-WebRTC-Engine: kamailio" \
     -H "Content-Type: application/json" \
     --data @"$payload" \
     "$base/api/v1/webrtc/edge/bootstrap" \

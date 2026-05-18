@@ -73,8 +73,9 @@ Register the node in MNSCloud, place the generated node token in:
 /etc/mnscloud/kamailio-webrtc/node.token
 ```
 
-If the token is provided during installation, the installer validates the node
-against the MNSCloud API automatically. If the token is added later, run:
+The installer validates that the node UUID is registered in MNSCloud with engine
+`kamailio`. If the token is provided during installation, it also validates the
+token against the MNSCloud API automatically. If the token is added later, run:
 
 ```bash
 sudo systemctl restart mnscloud-webrtc-sync.service

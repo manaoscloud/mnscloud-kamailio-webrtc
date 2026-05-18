@@ -48,13 +48,16 @@ When the token is provided during installation, the installer validates the node
 against:
 
 ```text
+POST /api/v1/webrtc/edge/validate
 POST /api/v1/webrtc/edge/bootstrap
 ```
 
 The node UUID is sent in `X-WebRTC-Node-UUID`, and the token is sent as a bearer
-token. If the token is not provided during installation, register the displayed
-UUID in MNSCloud, rotate/generate the token in the WebRTC server screen, write it
-to `node.token`, and then run the sync service.
+token. The installer always validates that the UUID is registered in MNSCloud
+with engine `kamailio` before installing Kamailio and rtpengine. If the token is
+not provided during installation, register the displayed UUID in MNSCloud,
+rotate/generate the token in the WebRTC server screen, write it to `node.token`,
+and then run the sync service.
 
 ## Synchronize Configuration
 
