@@ -47,6 +47,14 @@ FreeSWITCH / Asterisk PABX
 
 ## Install
 
+Supported operating systems:
+
+- Debian 12
+- Debian 13
+
+The installer uses Debian official repositories for Nginx and rtpengine, and
+the official Kamailio 6.1 repository for Kamailio packages.
+
 ```bash
 git clone https://github.com/manaoscloud/mnscloud-kamailio-webrtc.git
 cd mnscloud-kamailio-webrtc

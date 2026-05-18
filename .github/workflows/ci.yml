@@ -13,4 +13,50 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Shell syntax check
-        run: bash -n scripts/*.sh
+        run: |
+          bash -n scripts/*.sh
+          bash -n scripts/lib/*.sh
+
+  package-availability:
+    name: Package availability
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - debian:12
+          - debian:13
+    steps:
+      - name: Check Debian and Kamailio packages
+        run: |
+          docker run --rm "${{ matrix.image }}" bash -lc '
+            set -euo pipefail
+            . /etc/os-release
+            apt-get update -y
+            apt-get install -y --no-install-recommends ca-certificates curl gnupg lsb-release
+
+            for package in jq uuid-runtime nginx openssl dnsutils netcat-openbsd rtpengine; do
+              apt-cache show "$package" >/dev/null
+            done
+
+            install -d -m 0755 /usr/share/keyrings
+            curl -fsSL -o /usr/share/keyrings/kamailio.asc.tmp https://deb.kamailio.org/kamailiodebkey.gpg
+            gpg --batch --yes --dearmor -o /usr/share/keyrings/kamailio.gpg /usr/share/keyrings/kamailio.asc.tmp
+            rm -f /usr/share/keyrings/kamailio.asc.tmp
+            printf "deb [signed-by=/usr/share/keyrings/kamailio.gpg] http://deb.kamailio.org/kamailio61 %s main\n" "$VERSION_CODENAME" \
+              > /etc/apt/sources.list.d/kamailio.list
+            apt-get update -y
+
+            for package in \
+              kamailio \
+              kamailio-websocket-modules \
+              kamailio-tls-modules \
+              kamailio-json-modules \
+              kamailio-utils-modules \
+              kamailio-extra-modules \
+              kamailio-outbound-modules \
+              kamailio-presence-modules; do
+              policy="$(apt-cache policy "$package")"
+              grep -q deb.kamailio.org <<< "$policy"
+            done
+          '

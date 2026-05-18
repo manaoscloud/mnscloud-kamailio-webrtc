@@ -5,8 +5,12 @@
 Supported operating systems:
 
 - Debian 12
-- Ubuntu 22.04
-- Ubuntu 24.04
+- Debian 13
+
+The installer uses Debian official repositories for base packages, Nginx, and
+rtpengine. Kamailio is installed from the official Kamailio 6.1 APT repository
+for Debian `bookworm` or `trixie`, with APT pinning so Kamailio packages are not
+silently mixed with older distribution packages.
 
 Run:
 
@@ -42,4 +46,3 @@ Or use systemd:
 ```bash
 sudo systemctl restart mnscloud-webrtc-sync.service
 ```
-
