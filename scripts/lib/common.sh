@@ -60,6 +60,14 @@ prompt_default() {
   printf '%s' "${value:-$default}"
 }
 
+prompt_secret_optional() {
+  local prompt="$1"
+  local value
+  read -r -s -p "$prompt: " value
+  printf '\n' >&2
+  printf '%s' "$value"
+}
+
 ensure_uuid_file() {
   local path="$1"
   if [[ ! -s "$path" ]]; then
