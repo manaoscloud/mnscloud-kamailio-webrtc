@@ -29,8 +29,8 @@ The installer asks for:
 
 - MNSCloud API base URL
 - WebRTC edge public domain
-- WebRTC node token generated in MNSCloud, when the node has already been
-  registered in `VoIP > WebRTC > Server`
+- WebRTC node token generated in MNSCloud after the node has been registered in
+  `VoIP > WebRTC > Server` with engine `kamailio`
 
 It generates:
 
@@ -53,11 +53,9 @@ POST /api/v1/webrtc/edge/bootstrap
 ```
 
 The node UUID is sent in `X-WebRTC-Node-UUID`, and the token is sent as a bearer
-token. The installer always validates that the UUID is registered in MNSCloud
-with engine `kamailio` before installing Kamailio and rtpengine. If the token is
-not provided during installation, register the displayed UUID in MNSCloud,
-rotate/generate the token in the WebRTC server screen, write it to `node.token`,
-and then run the sync service.
+token. The installer validates that the UUID is registered in MNSCloud with
+engine `kamailio` and that the token is valid before installing Kamailio and
+rtpengine. If validation fails, the installer stops.
 
 ## Synchronize Configuration
 

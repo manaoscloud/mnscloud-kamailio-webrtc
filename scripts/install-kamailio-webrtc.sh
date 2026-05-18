@@ -21,12 +21,12 @@ main() {
   install -d -m 0700 "$CONFIG_DIR" "$STATE_DIR" "$LOG_DIR"
   ensure_uuid_file "$CONFIG_DIR/node.uuid"
   info "Node UUID: $(node_uuid)"
-  info "Register this UUID in MNSCloud before providing a node token."
+  info "Register this UUID in MNSCloud with engine kamailio before continuing."
 
   local api_base server_name node_token_value
   api_base="$(prompt_default "MNSCloud API base URL" "https://api.example.com")"
   server_name="$(prompt_default "WebRTC edge public domain" "webrtc.example.com")"
-  node_token_value="$(prompt_optional "WebRTC node token generated in MNSCloud (leave empty to validate token later)")"
+  node_token_value="$(prompt_required "WebRTC node token generated in MNSCloud")"
 
   save_api_base "$api_base"
   save_node_token "$node_token_value"
@@ -43,11 +43,7 @@ main() {
   render_rtpengine_config
   install_systemd_units
 
-  if [[ -s "$CONFIG_DIR/node.token" ]]; then
-    bootstrap_edge_node "$server_name"
-  else
-    warn "Node token was not provided; skipping token validation during install."
-  fi
+  bootstrap_edge_node "$server_name"
 
   validate_nginx
   validate_kamailio
@@ -55,10 +51,6 @@ main() {
 
   ok "MNSCloud Kamailio WebRTC Edge installed."
   info "Node UUID: $(node_uuid)"
-  if [[ ! -s "$CONFIG_DIR/node.token" ]]; then
-    info "Register this node in MNSCloud, rotate/generate the token, write it to $CONFIG_DIR/node.token, then run:"
-    info "systemctl restart mnscloud-webrtc-sync.service"
-  fi
   info "Cyber Security is applied separately through MNSCloud Agent using the WebRTC Edge profile."
 }
 

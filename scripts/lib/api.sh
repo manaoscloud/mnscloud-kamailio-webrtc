@@ -49,8 +49,7 @@ validate_edge_registration() {
   local base uuid token output payload status
   base="$(api_base)"
   uuid="$(node_uuid)"
-  token=""
-  [[ -s "$CONFIG_DIR/node.token" ]] && token="$(node_token)"
+  token="$(node_token)"
   output="$(mktemp)"
   payload="$(mktemp)"
   jq -n \
@@ -58,24 +57,14 @@ validate_edge_registration() {
     --arg engine "$engine" \
     '{node_uuid:$node_uuid, engine:$engine}' > "$payload"
 
-  if [[ -n "$token" ]]; then
-    status="$(curl -sS -o "$output" -w "%{http_code}" \
-      -X POST \
-      -H "Authorization: Bearer $token" \
-      -H "X-WebRTC-Node-UUID: $uuid" \
-      -H "X-WebRTC-Engine: $engine" \
-      -H "Content-Type: application/json" \
-      --data @"$payload" \
-      "$base/api/v1/webrtc/edge/validate" || true)"
-  else
-    status="$(curl -sS -o "$output" -w "%{http_code}" \
-      -X POST \
-      -H "X-WebRTC-Node-UUID: $uuid" \
-      -H "X-WebRTC-Engine: $engine" \
-      -H "Content-Type: application/json" \
-      --data @"$payload" \
-      "$base/api/v1/webrtc/edge/validate" || true)"
-  fi
+  status="$(curl -sS -o "$output" -w "%{http_code}" \
+    -X POST \
+    -H "Authorization: Bearer $token" \
+    -H "X-WebRTC-Node-UUID: $uuid" \
+    -H "X-WebRTC-Engine: $engine" \
+    -H "Content-Type: application/json" \
+    --data @"$payload" \
+    "$base/api/v1/webrtc/edge/validate" || true)"
 
   if [[ "$status" != 2* ]]; then
     warn "MNSCloud WebRTC edge validation failed."
@@ -85,13 +74,9 @@ validate_edge_registration() {
   fi
 
   jq -e '.status == "success" and .data.registered == true' "$output" >/dev/null
-  if [[ -n "$token" ]]; then
-    jq -e '.data.tokenValidated == true' "$output" >/dev/null ||
-      die "WebRTC node token was not validated by MNSCloud."
-    ok "WebRTC edge node UUID, engine, and token validated against MNSCloud API."
-  else
-    ok "WebRTC edge node UUID and engine validated against MNSCloud API."
-  fi
+  jq -e '.data.tokenValidated == true' "$output" >/dev/null ||
+    die "WebRTC node token was not validated by MNSCloud."
+  ok "WebRTC edge node UUID, engine, and token validated against MNSCloud API."
   rm -f "$output" "$payload"
 }
 

@@ -60,11 +60,17 @@ prompt_default() {
   printf '%s' "${value:-$default}"
 }
 
-prompt_optional() {
+prompt_required() {
   local prompt="$1"
   local value
-  read -r -p "$prompt: " value
-  printf '%s' "$value"
+  while true; do
+    read -r -p "$prompt: " value
+    if [[ -n "$value" ]]; then
+      printf '%s' "$value"
+      return 0
+    fi
+    warn "$prompt is required."
+  done
 }
 
 ensure_uuid_file() {
