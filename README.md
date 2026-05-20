@@ -55,9 +55,17 @@ Supported operating systems:
 The installer uses Debian official repositories for Nginx and rtpengine, and
 the official Kamailio 6.1 repository for Kamailio packages.
 
+Install GitHub CLI if needed, then authenticate before cloning this private
+repository: [cli/cli installation](https://github.com/cli/cli#installation).
+
 ```bash
-git clone https://github.com/manaoscloud/mnscloud-kamailio-webrtc.git
-cd mnscloud-kamailio-webrtc
+gh auth login
+gh auth status
+
+sudo install -d -m 0755 /opt/mnscloud
+cd /opt/mnscloud
+gh repo clone manaoscloud/mnscloud-kamailio-webrtc
+cd /opt/mnscloud/mnscloud-kamailio-webrtc
 sudo bash scripts/install-kamailio-webrtc.sh
 ```
 
