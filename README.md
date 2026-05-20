@@ -52,8 +52,8 @@ Supported operating systems:
 - Debian 12
 - Debian 13
 
-The installer uses Debian official repositories for Nginx and rtpengine, and
-the official Kamailio 6.1 repository for Kamailio packages.
+The installer configures the official stable nginx.org repository for Nginx, uses Debian official
+repositories for rtpengine, and uses the official Kamailio 6.1 repository for Kamailio packages.
 
 Install GitHub CLI if needed:
 [cli/cli installation](https://github.com/cli/cli#installation).

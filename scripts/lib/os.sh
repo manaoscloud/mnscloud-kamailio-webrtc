@@ -23,6 +23,8 @@ require_supported_os() {
 }
 
 install_base_packages() {
+  install_nginx_org_repository
+
   run apt-get update -y
   apt_install \
     ca-certificates curl gnupg lsb-release jq uuid-runtime \
@@ -34,6 +36,35 @@ apt_install() {
     -o Dpkg::Options::=--force-confdef \
     -o Dpkg::Options::=--force-confold \
     "$@"
+}
+
+install_nginx_org_repository() {
+  run apt-get update -y
+  apt_install curl gnupg2 ca-certificates lsb-release debian-archive-keyring
+
+  install -d -m 0755 /usr/share/keyrings
+  run rm -f /usr/share/keyrings/nginx-archive-keyring.gpg.tmp
+  run curl -fsSL -o /usr/share/keyrings/nginx_signing.key.tmp https://nginx.org/keys/nginx_signing.key
+  run gpg --batch --yes --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg.tmp /usr/share/keyrings/nginx_signing.key.tmp
+  run rm -f /usr/share/keyrings/nginx_signing.key.tmp
+  run mv /usr/share/keyrings/nginx-archive-keyring.gpg.tmp /usr/share/keyrings/nginx-archive-keyring.gpg
+  run chmod 0644 /usr/share/keyrings/nginx-archive-keyring.gpg
+
+  local repo_codename="${OS_CODENAME:-}"
+  if [[ -z "$repo_codename" ]]; then
+    repo_codename="$(lsb_release -cs)"
+  fi
+
+  write_file "/etc/apt/sources.list.d/nginx.list" "0644" <<EOF
+deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian ${repo_codename} nginx
+EOF
+
+  write_file "/etc/apt/preferences.d/99nginx" "0644" <<'EOF'
+Package: *
+Pin: origin nginx.org
+Pin: release o=nginx
+Pin-Priority: 900
+EOF
 }
 
 install_kamailio_repository() {
