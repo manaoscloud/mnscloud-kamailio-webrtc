@@ -45,6 +45,28 @@ FreeSWITCH / Asterisk PABX
   through `GET /api/v1/webrtc/edge/config`.
 - **MNSCloud Cyber Security** is applied separately through the MNSCloud Agent.
 
+## Contract
+
+- Product/runtime: `mnscloud-kamailio-webrtc`
+- Project directory: `/opt/mnscloud/mnscloud-kamailio-webrtc`
+- Runtime install path: `/opt/mnscloud/kamailio-webrtc`
+- Installer: `scripts/install-kamailio-webrtc.sh`
+- Update command: `scripts/update-kamailio-webrtc.sh`
+- Sync service: `mnscloud-webrtc-sync.service`
+- Sync timer: `mnscloud-webrtc-sync.timer`
+- Core services: `nginx.service`, `kamailio.service`, `rtpengine.service`
+- Configuration directory: `/etc/mnscloud/kamailio-webrtc`
+- State directory: `/var/lib/mnscloud/kamailio-webrtc`
+- Log directory: `/var/log/mnscloud/kamailio-webrtc`
+- Node UUID: `/etc/mnscloud/kamailio-webrtc/node.uuid`
+- Node token: `/etc/mnscloud/kamailio-webrtc/node.token`
+- Nginx config: `/etc/nginx/conf.d/mnscloud-webrtc.conf`
+- Kamailio config: `/etc/kamailio/kamailio.cfg`
+- rtpengine config: `/etc/rtpengine/rtpengine.conf`
+- Edge config endpoint: `/api/v1/webrtc/edge/config`
+- Public WSS port: `443/tcp`
+- Public RTP range: `30000-40000/udp`
+
 ## Install
 
 Supported operating systems:
