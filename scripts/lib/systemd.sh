@@ -7,7 +7,7 @@ install_systemd_units() {
   install -m 0644 "$REPO_DIR/config/systemd/mnscloud-webrtc-sync.timer.template" \
     /etc/systemd/system/mnscloud-webrtc-sync.timer
   systemctl daemon-reload
-  systemctl enable mnscloud-webrtc-sync.timer
+  systemctl enable --now mnscloud-webrtc-sync.timer
 }
 
 enable_services() {
@@ -15,4 +15,3 @@ enable_services() {
   run systemctl enable --now kamailio
   run systemctl enable --now rtpengine
 }
-

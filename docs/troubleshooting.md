@@ -40,3 +40,7 @@ Common issues:
   - `auth_db ... unable to bind to a database driver` means database-backed
     authentication is loaded without a database driver. This edge is
     API/control-plane driven and must not require local database authentication.
+- `rtpengine` can start with `KERNEL FORWARDING DISABLED` when the running
+  kernel headers are not installed and the DKMS module cannot be built. Install
+  the matching `linux-headers-$(uname -r)` package when kernel forwarding is
+  required; otherwise rtpengine continues in userspace mode.
