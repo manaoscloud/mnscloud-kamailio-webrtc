@@ -19,6 +19,5 @@ install -m 0600 "$CONFIG_TMP" "$CONFIG_DIR/config.json"
 
 render_kamailio_config
 validate_kamailio
-systemctl reload kamailio || systemctl restart kamailio
+run systemctl restart kamailio
 ok "WebRTC edge configuration synchronized."
-

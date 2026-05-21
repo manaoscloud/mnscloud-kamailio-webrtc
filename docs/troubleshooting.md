@@ -52,3 +52,6 @@ Common issues:
 - On dual-stack nodes with IPv4 behind NAT and directly routed IPv6, configure
   rtpengine with both addresses in one line, separated by `;`, for example
   `interface=10.0.0.10!203.0.113.10;2001:db8::10`.
+- The sync service restarts Kamailio after rendering `/etc/kamailio/kamailio.cfg`.
+  Kamailio native configuration file changes require restart; module data
+  reloads via RPC are separate, module-specific operations.
