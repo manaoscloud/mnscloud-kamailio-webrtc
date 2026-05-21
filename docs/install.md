@@ -21,10 +21,18 @@ Before installing rtpengine, the installer attempts to install the matching
 built when the provider publishes compatible headers. If the matching package is
 not available, installation continues and rtpengine runs in userspace mode.
 
-The default rtpengine media interface is `any`, which lets rtpengine select
-non-loopback local addresses. On hosts behind NAT, adjust
-`/etc/rtpengine/rtpengine.conf` after installation to use the official
-`local!advertised` syntax, for example `interface=10.0.0.10!203.0.113.10`.
+The installer derives the rtpengine media interface from local routing and the
+WebRTC edge public domain. If the node has a private IPv4 address and the public
+domain resolves to a different IPv4 address, rtpengine is configured with the
+official `local!advertised` syntax. If the node also has a routed IPv6 address,
+it is added to the same `interface` line. Example:
+
+```ini
+interface=10.0.0.10!203.0.113.10;2001:db8::10
+```
+
+If no routable local address can be detected, the installer falls back to
+`interface=any`, which lets rtpengine select non-loopback local addresses.
 
 Run:
 

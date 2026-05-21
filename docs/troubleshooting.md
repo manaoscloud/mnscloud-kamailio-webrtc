@@ -49,3 +49,6 @@ Common issues:
   media interface is configured as a wildcard bind address. Use `interface=any`,
   a concrete local IP, a system interface name, or `local!advertised` when the
   edge is behind NAT.
+- On dual-stack nodes with IPv4 behind NAT and directly routed IPv6, configure
+  rtpengine with both addresses in one line, separated by `;`, for example
+  `interface=10.0.0.10!203.0.113.10;2001:db8::10`.

@@ -1,5 +1,5 @@
 [rtpengine]
-interface=any
+interface=@RTPENGINE_INTERFACE@
 listen-ng=127.0.0.1:2223
 port-min=30000
 port-max=40000

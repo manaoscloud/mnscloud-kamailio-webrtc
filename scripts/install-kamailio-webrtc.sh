@@ -40,7 +40,7 @@ main() {
 
   render_nginx_config "$server_name"
   render_kamailio_config
-  render_rtpengine_config
+  render_rtpengine_config "$server_name"
   install_systemd_units
 
   bootstrap_edge_node "$server_name"
