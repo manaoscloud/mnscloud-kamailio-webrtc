@@ -1,5 +1,6 @@
 loadmodule "xhttp.so"
 loadmodule "websocket.so"
+loadmodule "usrloc.so"
 loadmodule "nathelper.so"
 loadmodule "path.so"
 

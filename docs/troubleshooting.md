@@ -34,4 +34,9 @@ Common issues:
 - TLS not configured yet
 - Cyber Security profile not applied for RTP UDP range
 - PABX target unreachable from the edge server
-
+- Kamailio module initialization errors:
+  - `nathelper ... can't find usrloc module` means the template is missing the
+    `usrloc` dependency required for NAT ping support.
+  - `auth_db ... unable to bind to a database driver` means database-backed
+    authentication is loaded without a database driver. This edge is
+    API/control-plane driven and must not require local database authentication.

@@ -1,5 +1,5 @@
-loadmodule "sl.so"
 loadmodule "tm.so"
+loadmodule "sl.so"
 loadmodule "rr.so"
 loadmodule "maxfwd.so"
 loadmodule "textops.so"
@@ -27,4 +27,3 @@ route[MNSCLOUD_ROUTE] {
     }
     exit;
 }
-
