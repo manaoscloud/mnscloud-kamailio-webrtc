@@ -138,24 +138,16 @@ bootstrap_edge_node() {
 }
 
 runtime_private_ip() {
-  local ip_addr
-  ip_addr="$(runtime_default_route_source_ip 4 || true)"
-  if [[ -n "$ip_addr" ]]; then
-    printf '%s\n' "$ip_addr"
-    return 0
-  fi
-  runtime_default_route_source_ip 6 || true
+  runtime_join_values \
+    "$(runtime_default_route_source_ip 4 || true)" \
+    "$(runtime_default_route_source_ip 6 || true)"
 }
 
 runtime_public_ip() {
   local public_domain="$1"
-  local ip_addr
-  ip_addr="$(runtime_resolve_first_ip 4 "$public_domain" || true)"
-  if [[ -n "$ip_addr" ]]; then
-    printf '%s\n' "$ip_addr"
-    return 0
-  fi
-  runtime_resolve_first_ip 6 "$public_domain" || true
+  runtime_join_values \
+    "$(runtime_resolve_first_ip 4 "$public_domain" || true)" \
+    "$(runtime_resolve_first_ip 6 "$public_domain" || true)"
 }
 
 runtime_edge_version() {
@@ -210,4 +202,15 @@ runtime_resolve_first_ip() {
   fi
 
   getent ahostsv6 "$name" 2>/dev/null | awk '{ print $1; exit }'
+}
+
+runtime_join_values() {
+  local values=()
+  local value
+  for value in "$@"; do
+    [[ -n "$value" ]] || continue
+    values+=("$value")
+  done
+  local IFS=', '
+  printf '%s\n' "${values[*]}"
 }
