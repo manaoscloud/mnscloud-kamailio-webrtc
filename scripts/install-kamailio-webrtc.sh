@@ -29,6 +29,7 @@ main() {
   node_token_value="$(prompt_required "WebRTC node token generated in MNSCloud")"
 
   save_api_base "$api_base"
+  save_public_domain "$server_name"
   save_node_token "$node_token_value"
   install_payload "$SOURCE_DIR"
   REPO_DIR="$INSTALL_DIR"
