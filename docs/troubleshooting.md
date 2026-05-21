@@ -45,3 +45,7 @@ Common issues:
   installer attempts to install `linux-headers-$(uname -r)` automatically. When
   that package is not available from the host repositories, align the provider
   kernel with available headers or keep rtpengine in userspace mode.
+- `rtpengine` fails with `Invalid interface specification: '0.0.0.0'` when the
+  media interface is configured as a wildcard bind address. Use `interface=any`,
+  a concrete local IP, a system interface name, or `local!advertised` when the
+  edge is behind NAT.

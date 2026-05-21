@@ -21,6 +21,11 @@ Before installing rtpengine, the installer attempts to install the matching
 built when the provider publishes compatible headers. If the matching package is
 not available, installation continues and rtpengine runs in userspace mode.
 
+The default rtpengine media interface is `any`, which lets rtpengine select
+non-loopback local addresses. On hosts behind NAT, adjust
+`/etc/rtpengine/rtpengine.conf` after installation to use the official
+`local!advertised` syntax, for example `interface=10.0.0.10!203.0.113.10`.
+
 Run:
 
 ```bash
