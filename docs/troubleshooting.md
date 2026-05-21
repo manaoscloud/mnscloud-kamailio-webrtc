@@ -41,6 +41,7 @@ Common issues:
     authentication is loaded without a database driver. This edge is
     API/control-plane driven and must not require local database authentication.
 - `rtpengine` can start with `KERNEL FORWARDING DISABLED` when the running
-  kernel headers are not installed and the DKMS module cannot be built. Install
-  the matching `linux-headers-$(uname -r)` package when kernel forwarding is
-  required; otherwise rtpengine continues in userspace mode.
+  kernel headers are not installed and the DKMS module cannot be built. The
+  installer attempts to install `linux-headers-$(uname -r)` automatically. When
+  that package is not available from the host repositories, align the provider
+  kernel with available headers or keep rtpengine in userspace mode.

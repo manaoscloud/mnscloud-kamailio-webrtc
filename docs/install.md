@@ -16,6 +16,11 @@ APT package installation runs in non-interactive mode and keeps existing local
 configuration files when Debian package prompts appear. The installer writes the
 MNSCloud Kamailio configuration after package installation.
 
+Before installing rtpengine, the installer attempts to install the matching
+`linux-headers-$(uname -r)` package so the rtpengine DKMS kernel module can be
+built when the provider publishes compatible headers. If the matching package is
+not available, installation continues and rtpengine runs in userspace mode.
+
 Run:
 
 ```bash
