@@ -70,6 +70,7 @@ FreeSWITCH / Asterisk PABX
 - Domain TLS directory: `/etc/mnscloud/kamailio-webrtc/tls/domains/<domain>/`
 - Nginx config: `/etc/nginx/conf.d/mnscloud-webrtc.conf`
 - Kamailio config: `/etc/kamailio/kamailio.cfg`
+- Generated PABX routes: `/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg`
 - rtpengine config: `/etc/rtpengine/rtpengine.conf`
 - Edge config endpoint: `/api/v1/webrtc/edge/config`
 - Public WSS port: `443/tcp`
@@ -138,6 +139,26 @@ After installation, configuration can be synchronized with:
 sudo systemctl restart mnscloud-webrtc-sync.service
 sudo systemctl status kamailio rtpengine nginx --no-pager
 ```
+
+## PABX Routing
+
+The edge does not route SIP traffic by extension username alone. The control
+plane sends a domain-based `pabxTargets` list in the runtime config, and the
+sync command renders Kamailio routes in:
+
+```text
+/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg
+```
+
+Each route maps the request domain to one internal PABX SIP target:
+
+```text
+extension@pbx.example.com -> sip:10.0.0.20:5060;transport=udp
+```
+
+If no target exists for a domain, Kamailio returns `404 No PABX target`. This is
+intentional: the edge must fail closed instead of relaying traffic to a stale or
+looping destination.
 
 ## Public Ports
 

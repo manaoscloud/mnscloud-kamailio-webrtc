@@ -1,6 +1,6 @@
-# Generated dispatcher entries are expected at:
-# /etc/kamailio/mnscloud/dispatcher.list
+# Generated PABX routes are rendered by scripts/lib/kamailio.sh at:
+# /etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg
 #
-# Routing must resolve the canonical identity:
+# Routing resolves the canonical identity:
 # extension@domain -> tenant -> PABX target.
-
+include_file "/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg"

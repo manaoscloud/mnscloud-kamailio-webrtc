@@ -24,6 +24,9 @@ and public-facing text must be written in English.
 
 - The canonical WebRTC identity is `extension@domain`.
 - Never authenticate or route by extension username alone.
+- Render domain-based PABX routing from the API `pabxTargets` runtime payload.
+  If a domain has no target, Kamailio must fail closed with `No PABX target`
+  instead of using stale dispatcher state or forwarding back to itself.
 - Keep Kamailio as the signaling SBC, rtpengine as the media relay, and PABX
   servers internal.
 - Do not require the MNSCloud Agent during service installation. Cyber Security
