@@ -43,6 +43,9 @@ FreeSWITCH / Asterisk PABX
   ICE/DTLS-SRTP and traditional PABX RTP/SRTP.
 - **MNSCloud API** is the control plane and provides dynamic edge configuration
   through `GET /api/v1/webrtc/edge/config`.
+- **MNSCloud Agent** can optionally apply domain changes immediately through a
+  typed `webrtc.edge.sync` job while the local timer remains the reconciliation
+  fallback.
 - **MNSCloud Cyber Security** is applied separately through the MNSCloud Agent.
 
 ## Contract
@@ -54,6 +57,8 @@ FreeSWITCH / Asterisk PABX
 - Update command: `scripts/update-kamailio-webrtc.sh`
 - Sync service: `mnscloud-webrtc-sync.service`
 - Sync timer: `mnscloud-webrtc-sync.timer`
+- Optional Agent capability: `webrtc.kamailio.manage`
+- Optional Agent command: `webrtc.edge.sync`
 - Core services: `nginx.service`, `kamailio.service`, `rtpengine.service`
 - Configuration directory: `/etc/mnscloud/kamailio-webrtc`
 - State directory: `/var/lib/mnscloud/kamailio-webrtc`
