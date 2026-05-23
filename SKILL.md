@@ -27,6 +27,9 @@ and public-facing text must be written in English.
 - Render domain-based PABX routing from the API `pabxTargets` runtime payload.
   If a domain has no target, Kamailio must fail closed with `No PABX target`
   instead of using stale dispatcher state or forwarding back to itself.
+- Generate Kamailio listeners from runtime config. Public WebSocket traffic
+  terminates on Nginx, while SIP listeners must stay on loopback/private
+  interfaces needed to reach the PABX.
 - Keep Kamailio as the signaling SBC, rtpengine as the media relay, and PABX
   servers internal.
 - Do not require the MNSCloud Agent during service installation. Cyber Security

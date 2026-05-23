@@ -12,8 +12,7 @@ children=8
 auto_aliases=no
 tcp_accept_no_cl=yes
 
-listen=tcp:127.0.0.1:5066
-listen=udp:127.0.0.1:5060
+include_file "/etc/kamailio/mnscloud/mnscloud-listen.cfg"
 
 mpath="/usr/lib/x86_64-linux-gnu/kamailio/modules/"
 

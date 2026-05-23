@@ -70,6 +70,7 @@ FreeSWITCH / Asterisk PABX
 - Domain TLS directory: `/etc/mnscloud/kamailio-webrtc/tls/domains/<domain>/`
 - Nginx config: `/etc/nginx/conf.d/mnscloud-webrtc.conf`
 - Kamailio config: `/etc/kamailio/kamailio.cfg`
+- Generated Kamailio listeners: `/etc/kamailio/mnscloud/mnscloud-listen.cfg`
 - Generated PABX routes: `/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg`
 - rtpengine config: `/etc/rtpengine/rtpengine.conf`
 - Edge config endpoint: `/api/v1/webrtc/edge/config`
@@ -172,7 +173,7 @@ Recommended public exposure:
 Do not expose these publicly by default:
 
 ```text
-5060/udp
+5060/udp and 5060/tcp on public interfaces
 5061/tcp
 rtpengine control port
 Kamailio admin ports
