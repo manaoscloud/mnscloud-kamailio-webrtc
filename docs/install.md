@@ -78,7 +78,14 @@ edge server and can issue Let’s Encrypt certificates when:
 - The API returns `certbotEmail`. It resolves this from WebRTC parameter
   `certbot_email`, then the tenant/user email, then `no-reply@manaos.cloud`.
 
-Register this node in MNSCloud and write the generated token to:
+For production provisioning, enroll `mnscloud-agent` first and confirm it is
+online with the `webrtc.kamailio.manage` capability. WebRTC domain, certificate,
+and edge sync work is then delivered as Agent jobs. The app may show only a
+short-lived Agent enrollment token; the long-lived Agent runtime token is issued
+directly to the server during `POST /api/v1/agent/enroll`.
+
+Manual fallback installs still register this node in MNSCloud and write the
+generated token to:
 
 ```text
 /etc/mnscloud/kamailio-webrtc/node.token
