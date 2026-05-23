@@ -75,7 +75,8 @@ edge server and can issue Let’s Encrypt certificates when:
 - DNS `A`/`AAAA` records point to the WebRTC edge.
 - `80/tcp` and `443/tcp` reach Nginx.
 - Certbot is installed by the module.
-- WebRTC parameter `certbot_email` is configured for the tenant or server.
+- The API returns `certbotEmail`. It resolves this from WebRTC parameter
+  `certbot_email`, then the tenant/user email, then `no-reply@manaos.cloud`.
 
 Register this node in MNSCloud and write the generated token to:
 

@@ -33,6 +33,12 @@ nginx_config_value() {
 }
 
 nginx_certbot_email() {
+  local email
+  email="$(nginx_config_value '.data.certbotEmail' '')"
+  if [[ -n "$email" ]]; then
+    printf '%s\n' "$email"
+    return 0
+  fi
   nginx_config_value '.data.parameters[]? | select(.key == "certbot_email") | .value' ''
 }
 

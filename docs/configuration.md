@@ -37,7 +37,9 @@ API. Each active auto-provisioned domain gets a dedicated HTTPS/WSS server block
 on `443/tcp` using SNI. The edge supports:
 
 - `letsencrypt`: use an existing Let’s Encrypt certificate or issue one with
-  Certbot when the `certbot_email` WebRTC parameter is configured.
+  Certbot using the `certbotEmail` value returned by the API. The control plane
+  resolves it from `certbot_email`, then the tenant/user email, then the
+  platform fallback `no-reply@manaos.cloud`.
 - `manual`: use certificate files already placed in the domain TLS directory.
 - `self_signed`: generate a temporary self-signed certificate for development.
 
