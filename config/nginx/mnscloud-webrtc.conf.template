@@ -1,5 +1,6 @@
 server {
     listen 80;
+    listen [::]:80;
     server_name {{SERVER_NAME}};
 
     location = /health {
@@ -14,6 +15,7 @@ server {
 
 server {
     listen 443 ssl;
+    listen [::]:443 ssl;
     http2 on;
     server_name {{SERVER_NAME}};
 

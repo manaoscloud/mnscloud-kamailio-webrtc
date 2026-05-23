@@ -12,5 +12,4 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=full
-ReadWritePaths=/etc/mnscloud/kamailio-webrtc /etc/kamailio /var/lib/mnscloud/kamailio-webrtc /var/log/mnscloud/kamailio-webrtc
-
+ReadWritePaths=/etc/mnscloud/kamailio-webrtc /etc/kamailio /etc/nginx/conf.d /var/lib/mnscloud/kamailio-webrtc /var/log/mnscloud/kamailio-webrtc
