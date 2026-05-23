@@ -68,6 +68,15 @@ If those files are missing, the installer generates a temporary self-signed
 certificate so Nginx can start. Browser WebRTC clients require a trusted
 certificate, so replace the temporary certificate before production use.
 
+Additional public WSS domains can be registered in MNSCloud under
+`VoIP > WebRTC > Domain`. The sync service renders those domains on the same
+edge server and can issue Let’s Encrypt certificates when:
+
+- DNS `A`/`AAAA` records point to the WebRTC edge.
+- `80/tcp` and `443/tcp` reach Nginx.
+- Certbot is installed by the module.
+- WebRTC parameter `certbot_email` is configured for the tenant or server.
+
 Register this node in MNSCloud and write the generated token to:
 
 ```text

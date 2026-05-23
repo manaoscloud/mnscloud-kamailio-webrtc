@@ -20,9 +20,33 @@ Nginx TLS files live in:
 /etc/mnscloud/kamailio-webrtc/tls/privkey.pem
 ```
 
+Additional partner/tenant domains managed from MNSCloud are rendered with their
+own certificate material under:
+
+```text
+/etc/mnscloud/kamailio-webrtc/tls/domains/<domain>/fullchain.pem
+/etc/mnscloud/kamailio-webrtc/tls/domains/<domain>/privkey.pem
+```
+
 Nginx renders `/health` on HTTP and HTTPS, redirects regular HTTP traffic to
 HTTPS, and proxies secure WebSocket traffic from `https://<public-domain>/ws`
 to the local Kamailio WebSocket listener.
+
+The sync process also renders active `VoipWebRtcDomain` records returned by the
+API. Each active auto-provisioned domain gets a dedicated HTTPS/WSS server block
+on `443/tcp` using SNI. The edge supports:
+
+- `letsencrypt`: use an existing Let’s Encrypt certificate or issue one with
+  Certbot when the `certbot_email` WebRTC parameter is configured.
+- `manual`: use certificate files already placed in the domain TLS directory.
+- `self_signed`: generate a temporary self-signed certificate for development.
+
+For Let’s Encrypt HTTP-01 validation, the domain DNS must point to the WebRTC
+edge and port `80/tcp` must reach Nginx. The edge serves ACME challenges from:
+
+```text
+/var/www/mnscloud-webrtc-acme/.well-known/acme-challenge/
+```
 
 The sync process fetches:
 

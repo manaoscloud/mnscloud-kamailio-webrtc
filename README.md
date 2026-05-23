@@ -62,6 +62,7 @@ FreeSWITCH / Asterisk PABX
 - Node token: `/etc/mnscloud/kamailio-webrtc/node.token`
 - TLS certificate: `/etc/mnscloud/kamailio-webrtc/tls/fullchain.pem`
 - TLS private key: `/etc/mnscloud/kamailio-webrtc/tls/privkey.pem`
+- Domain TLS directory: `/etc/mnscloud/kamailio-webrtc/tls/domains/<domain>/`
 - Nginx config: `/etc/nginx/conf.d/mnscloud-webrtc.conf`
 - Kamailio config: `/etc/kamailio/kamailio.cfg`
 - rtpengine config: `/etc/rtpengine/rtpengine.conf`
@@ -119,6 +120,12 @@ Kamailio WebSocket listener. If no certificate exists under
 `/etc/mnscloud/kamailio-webrtc/tls/`, the installer creates a temporary
 self-signed certificate so the service can start. Replace it with a trusted
 certificate before using browser or mobile clients in production.
+
+One edge server can publish multiple partner or tenant WSS domains. Register
+those domains in MNSCloud as WebRTC domains for the selected server; the sync
+service renders SNI-based Nginx blocks and manages per-domain certificate paths.
+For automatic Let’s Encrypt issuance, make sure the domain DNS points to the
+edge and configure the WebRTC parameter `certbot_email`.
 
 After installation, configuration can be synchronized with:
 
