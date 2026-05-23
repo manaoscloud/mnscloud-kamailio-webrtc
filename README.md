@@ -64,7 +64,6 @@ FreeSWITCH / Asterisk PABX
 - State directory: `/var/lib/mnscloud/kamailio-webrtc`
 - Log directory: `/var/log/mnscloud/kamailio-webrtc`
 - Node UUID: `/etc/mnscloud/kamailio-webrtc/node.uuid`
-- Node token: `/etc/mnscloud/kamailio-webrtc/node.token`
 - TLS certificate: `/etc/mnscloud/kamailio-webrtc/tls/fullchain.pem`
 - TLS private key: `/etc/mnscloud/kamailio-webrtc/tls/privkey.pem`
 - Domain TLS directory: `/etc/mnscloud/kamailio-webrtc/tls/domains/<domain>/`
@@ -112,15 +111,9 @@ The installer creates a node UUID and stores local configuration under:
 /etc/mnscloud/kamailio-webrtc/
 ```
 
-Register the node in MNSCloud, place the generated node token in:
-
-```text
-/etc/mnscloud/kamailio-webrtc/node.token
-```
-
-The installer requires the generated token during installation and validates
-that the node UUID is registered in MNSCloud with engine `kamailio` before
-installing Kamailio and rtpengine. If validation fails, the installer stops.
+Before installing the WebRTC edge, enroll `mnscloud-agent` and confirm it is online with
+`webrtc.kamailio.manage`. Edge sync, domain provisioning, and certificate issuance are executed
+through Agent jobs; the app does not expose server install credentials.
 
 Nginx publishes WebRTC traffic on `443/tcp` and proxies `/ws` to the local
 Kamailio WebSocket listener. If no certificate exists under

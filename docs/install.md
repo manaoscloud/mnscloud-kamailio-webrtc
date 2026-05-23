@@ -40,15 +40,10 @@ Run:
 sudo bash scripts/install-kamailio-webrtc.sh
 ```
 
-The installer creates and prints the node UUID before asking for the token, so
-fresh nodes can be registered in MNSCloud during the installation flow.
-
 The installer asks for:
 
 - MNSCloud API base URL
 - WebRTC edge public domain
-- WebRTC node token generated in MNSCloud after the node has been registered in
-  `VoIP > WebRTC > Server` with engine `kamailio`
 
 It generates:
 
@@ -84,25 +79,10 @@ and edge sync work is then delivered as Agent jobs. The app may show only a
 short-lived Agent enrollment token; the long-lived Agent runtime token is issued
 directly to the server during `POST /api/v1/agent/enroll`.
 
-Manual fallback installs still register this node in MNSCloud and write the
-generated token to:
-
-```text
-/etc/mnscloud/kamailio-webrtc/node.token
-```
-
-When the token is provided during installation, the installer validates the node
-against:
-
-```text
-POST /api/v1/webrtc/edge/validate
-POST /api/v1/webrtc/edge/bootstrap
-```
-
-The node UUID is sent in `X-WebRTC-Node-UUID`, and the token is sent as a bearer
-token. The installer validates that the UUID is registered in MNSCloud with
-engine `kamailio` and that the token is valid before installing Kamailio and
-rtpengine. If validation fails, the installer stops.
+Provisioning is Agent-first. The WebRTC server must be assigned to an online
+`mnscloud-agent` with `webrtc.kamailio.manage`; configuration sync, domain
+provisioning, and certificate work are delivered as Agent jobs and recorded in
+Activity Logs.
 
 ## Synchronize Configuration
 

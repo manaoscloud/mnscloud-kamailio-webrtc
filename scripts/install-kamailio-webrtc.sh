@@ -21,21 +21,20 @@ main() {
   install -d -m 0700 "$CONFIG_DIR" "$STATE_DIR" "$LOG_DIR"
   ensure_uuid_file "$CONFIG_DIR/node.uuid"
   info "Node UUID: $(node_uuid)"
-  info "Register this UUID in MNSCloud with engine kamailio before continuing."
+  if ! systemctl is-active --quiet mnscloud-agent; then
+    die "mnscloud-agent must be installed, enrolled, and active before installing the WebRTC edge."
+  fi
 
-  local api_base server_name node_token_value
+  local api_base server_name
   api_base="$(prompt_default "MNSCloud API base URL" "https://api.example.com")"
   server_name="$(prompt_default "WebRTC edge public domain" "webrtc.example.com")"
-  node_token_value="$(prompt_required "WebRTC node token generated in MNSCloud")"
 
   save_api_base "$api_base"
   save_public_domain "$server_name"
-  save_node_token "$node_token_value"
   install_payload "$SOURCE_DIR"
   REPO_DIR="$INSTALL_DIR"
 
   install_base_packages
-  validate_edge_registration "kamailio"
   install_kamailio
   install_rtpengine
 
@@ -44,15 +43,13 @@ main() {
   render_rtpengine_config "$server_name"
   install_systemd_units
 
-  bootstrap_edge_node "$server_name"
-
   validate_nginx
   validate_kamailio
   enable_services
 
   ok "MNSCloud Kamailio WebRTC Edge installed."
   info "Node UUID: $(node_uuid)"
-  info "Cyber Security is applied separately through MNSCloud Agent using the WebRTC Edge profile."
+  info "Assign this server to the active MNSCloud Agent and provision edge sync from the platform."
 }
 
 main "$@"

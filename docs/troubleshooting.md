@@ -29,7 +29,7 @@ journalctl -u nginx -n 200 --no-pager
 
 Common issues:
 
-- Node token missing in `/etc/mnscloud/kamailio-webrtc/node.token`
+- Assigned Agent is offline or missing `webrtc.kamailio.manage`
 - Public DNS not pointing to the edge server
 - TLS not configured yet
 - Cyber Security profile not applied for RTP UDP range

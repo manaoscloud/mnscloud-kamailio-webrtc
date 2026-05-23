@@ -56,10 +56,10 @@ The sync process fetches:
 GET /api/v1/webrtc/edge/config
 ```
 
-Expected request headers:
+Expected server-side request headers:
 
 ```text
-Authorization: Bearer <node-token>
+Authorization: Bearer <server-runtime-token>
 X-WebRTC-Node-UUID: <node-uuid>
 ```
 

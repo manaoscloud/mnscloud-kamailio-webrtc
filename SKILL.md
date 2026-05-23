@@ -32,11 +32,8 @@ and public-facing text must be written in English.
   interfaces needed to reach the PABX.
 - Keep Kamailio as the signaling SBC, rtpengine as the media relay, and PABX
   servers internal.
-- Do not require the MNSCloud Agent during service installation. Cyber Security
-  profiles are applied separately through the Agent.
-- The MNSCloud Agent may optionally trigger immediate reconciliation through
-  `webrtc.kamailio.manage` and `webrtc.edge.sync`; keep the timer/service sync
-  path as the standalone fallback.
+- Require MNSCloud Agent enrollment before production provisioning. Immediate reconciliation runs
+  through `webrtc.kamailio.manage` and `webrtc.edge.sync`.
 - Nginx must be installed from the official stable nginx.org repository.
 - The current full WebRTC installer supports Debian 12/13 because Kamailio and
   rtpengine package installation is Debian-based.
