@@ -28,5 +28,8 @@ Recommended public ports:
 30000-40000/udp
 ```
 
-Do not expose Kamailio admin ports or rtpengine control ports publicly.
+The installer may create a temporary self-signed certificate when no TLS
+certificate is installed. This is only a bootstrapping fallback. Public WebRTC
+clients should use a trusted certificate for the edge public domain.
 
+Do not expose Kamailio admin ports or rtpengine control ports publicly.

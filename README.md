@@ -60,6 +60,8 @@ FreeSWITCH / Asterisk PABX
 - Log directory: `/var/log/mnscloud/kamailio-webrtc`
 - Node UUID: `/etc/mnscloud/kamailio-webrtc/node.uuid`
 - Node token: `/etc/mnscloud/kamailio-webrtc/node.token`
+- TLS certificate: `/etc/mnscloud/kamailio-webrtc/tls/fullchain.pem`
+- TLS private key: `/etc/mnscloud/kamailio-webrtc/tls/privkey.pem`
 - Nginx config: `/etc/nginx/conf.d/mnscloud-webrtc.conf`
 - Kamailio config: `/etc/kamailio/kamailio.cfg`
 - rtpengine config: `/etc/rtpengine/rtpengine.conf`
@@ -111,6 +113,13 @@ Register the node in MNSCloud, place the generated node token in:
 The installer requires the generated token during installation and validates
 that the node UUID is registered in MNSCloud with engine `kamailio` before
 installing Kamailio and rtpengine. If validation fails, the installer stops.
+
+Nginx publishes WebRTC traffic on `443/tcp` and proxies `/ws` to the local
+Kamailio WebSocket listener. If no certificate exists under
+`/etc/mnscloud/kamailio-webrtc/tls/`, the installer creates a temporary
+self-signed certificate so the service can start. Replace it with a trusted
+certificate before using browser or mobile clients in production.
+
 After installation, configuration can be synchronized with:
 
 ```bash

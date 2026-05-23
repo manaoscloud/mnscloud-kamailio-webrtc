@@ -13,6 +13,17 @@ Kamailio files live in:
 /etc/kamailio/mnscloud/
 ```
 
+Nginx TLS files live in:
+
+```text
+/etc/mnscloud/kamailio-webrtc/tls/fullchain.pem
+/etc/mnscloud/kamailio-webrtc/tls/privkey.pem
+```
+
+Nginx renders `/health` on HTTP and HTTPS, redirects regular HTTP traffic to
+HTTPS, and proxies secure WebSocket traffic from `https://<public-domain>/ws`
+to the local Kamailio WebSocket listener.
+
 The sync process fetches:
 
 ```text

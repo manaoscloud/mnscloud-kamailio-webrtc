@@ -56,6 +56,18 @@ It generates:
 /etc/mnscloud/kamailio-webrtc/node.uuid
 ```
 
+The installer also renders Nginx for HTTPS/WSS on `443/tcp`. Trusted TLS
+material should be installed at:
+
+```text
+/etc/mnscloud/kamailio-webrtc/tls/fullchain.pem
+/etc/mnscloud/kamailio-webrtc/tls/privkey.pem
+```
+
+If those files are missing, the installer generates a temporary self-signed
+certificate so Nginx can start. Browser WebRTC clients require a trusted
+certificate, so replace the temporary certificate before production use.
+
 Register this node in MNSCloud and write the generated token to:
 
 ```text
