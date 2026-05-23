@@ -36,7 +36,7 @@ render_kamailio_pabx_routes() {
     printf '    xlog("L_INFO", "MNSCloud WebRTC route request method=$rm ruri=$ru from=$fu source=$si\\\\n");\n\n'
 
     if [[ -s "$config_file" ]]; then
-      jq -r '.pabxTargets // [] | .[] | @base64' "$config_file" | while IFS= read -r encoded; do
+      jq -r '(.pabxTargets // .data.pabxTargets // []) | .[] | @base64' "$config_file" | while IFS= read -r encoded; do
         local domain host port transport target_host target_uri
         domain="$(printf '%s' "$encoded" | base64 -d | jq -r '.domain // empty' | tr '[:upper:]' '[:lower:]')"
         host="$(printf '%s' "$encoded" | base64 -d | jq -r '.host // empty')"

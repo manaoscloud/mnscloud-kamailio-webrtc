@@ -143,8 +143,8 @@ sudo systemctl status kamailio rtpengine nginx --no-pager
 ## PABX Routing
 
 The edge does not route SIP traffic by extension username alone. The control
-plane sends a domain-based `pabxTargets` list in the runtime config, and the
-sync command renders Kamailio routes in:
+plane sends a domain-based `pabxTargets` list in the runtime config response,
+and the sync command renders Kamailio routes in:
 
 ```text
 /etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg
