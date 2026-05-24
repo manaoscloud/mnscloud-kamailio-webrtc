@@ -9,6 +9,7 @@ systemctl status nginx kamailio rtpengine --no-pager
 Validate configuration:
 
 ```bash
+sudo bash /opt/mnscloud/kamailio-webrtc/scripts/validate-kamailio-webrtc.sh
 nginx -t
 kamailio -c -f /etc/kamailio/kamailio.cfg
 ```

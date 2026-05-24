@@ -95,3 +95,11 @@ Or use systemd:
 ```bash
 sudo systemctl restart mnscloud-webrtc-sync.service
 ```
+
+## Validate Runtime
+
+After install or update, validate rendered configuration and core service health:
+
+```bash
+sudo bash /opt/mnscloud/kamailio-webrtc/scripts/validate-kamailio-webrtc.sh
+```
