@@ -3,6 +3,49 @@ set -Eeuo pipefail
 
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REPO_DIR="$SOURCE_DIR"
+API_BASE="${MNSCLOUD_API_BASE:-}"
+PUBLIC_DOMAIN="${MNSCLOUD_WEBRTC_PUBLIC_DOMAIN:-}"
+NODE_UUID="${MNSCLOUD_WEBRTC_NODE_UUID:-}"
+RUNTIME_TOKEN="${MNSCLOUD_WEBRTC_RUNTIME_TOKEN:-}"
+
+usage() {
+  cat <<'TXT'
+Usage:
+  scripts/install-kamailio-webrtc.sh [--api-base URL] [--public-domain DOMAIN] [--node-uuid UUID] [--runtime-token TOKEN]
+
+Installs the native MNSCloud Kamailio WebRTC edge runtime.
+TXT
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --api-base)
+      API_BASE="${2:-}"
+      shift 2
+      ;;
+    --public-domain)
+      PUBLIC_DOMAIN="${2:-}"
+      shift 2
+      ;;
+    --node-uuid)
+      NODE_UUID="${2:-}"
+      shift 2
+      ;;
+    --runtime-token)
+      RUNTIME_TOKEN="${2:-}"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "[mnscloud-kamailio-webrtc] unsupported option: $1" >&2
+      usage
+      exit 2
+      ;;
+  esac
+done
 
 # shellcheck source=scripts/lib/common.sh
 . "$REPO_DIR/scripts/lib/common.sh"
@@ -19,6 +62,7 @@ main() {
   require_supported_os
 
   install -d -m 0700 "$CONFIG_DIR" "$STATE_DIR" "$LOG_DIR"
+  save_node_uuid "$NODE_UUID"
   ensure_uuid_file "$CONFIG_DIR/node.uuid"
   info "Node UUID: $(node_uuid)"
   if ! systemctl is-active --quiet mnscloud-agent; then
@@ -26,11 +70,12 @@ main() {
   fi
 
   local api_base server_name
-  api_base="$(prompt_default "MNSCloud API base URL" "https://api.example.com")"
-  server_name="$(prompt_default "WebRTC edge public domain" "webrtc.example.com")"
+  api_base="${API_BASE:-$(prompt_default "MNSCloud API base URL" "https://api.example.com")}"
+  server_name="${PUBLIC_DOMAIN:-$(prompt_default "WebRTC edge public domain" "webrtc.example.com")}"
 
   save_api_base "$api_base"
   save_public_domain "$server_name"
+  save_runtime_token "$RUNTIME_TOKEN"
   install_payload "$SOURCE_DIR"
   REPO_DIR="$INSTALL_DIR"
 

@@ -15,6 +15,20 @@ save_public_domain() {
   chmod 0600 "$CONFIG_DIR/public.domain"
 }
 
+save_node_uuid() {
+  local node_uuid="$1"
+  [[ -n "$node_uuid" ]] || return 0
+  printf '%s\n' "$node_uuid" > "$CONFIG_DIR/node.uuid"
+  chmod 0600 "$CONFIG_DIR/node.uuid"
+}
+
+save_runtime_token() {
+  local token="$1"
+  [[ -n "$token" ]] || return 0
+  printf '%s\n' "$token" > "$CONFIG_DIR/runtime.token"
+  chmod 0600 "$CONFIG_DIR/runtime.token"
+}
+
 api_base() {
   [[ -s "$CONFIG_DIR/api.base" ]] || die "API base is not configured."
   tr -d '\r\n' < "$CONFIG_DIR/api.base"
