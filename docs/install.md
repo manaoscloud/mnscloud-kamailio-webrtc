@@ -41,20 +41,24 @@ sudo bash scripts/install-kamailio-webrtc.sh
 ```
 
 The installer also supports non-interactive parameters used by the MNSCloud App
-`Generate install command` action:
+`Generate install command` action. The generated command intentionally leaves
+the WebRTC public domain interactive because the correct WSS domain can vary per
+edge server:
 
 ```bash
 sudo bash scripts/install-kamailio-webrtc.sh \
   --api-base https://api.example.com \
-  --public-domain webrtc.example.com \
   --node-uuid 00000000-0000-0000-0000-000000000000 \
   --runtime-token '<shown-once-runtime-token>'
 ```
 
 The installer asks for:
 
-- MNSCloud API base URL
-- WebRTC edge public domain
+- MNSCloud API base URL, unless `--api-base` is supplied.
+- WebRTC edge public domain, defaulting to `webrtc.example.com`.
+
+Fully non-interactive automation can still pass `--public-domain` or set
+`MNSCLOUD_WEBRTC_PUBLIC_DOMAIN` explicitly.
 
 It generates:
 

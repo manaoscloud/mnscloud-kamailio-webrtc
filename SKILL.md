@@ -37,6 +37,10 @@ and public-facing text must be written in English.
 - Nginx must be installed from the official stable nginx.org repository.
 - The current full WebRTC installer supports Debian 12/13 because Kamailio and
   rtpengine package installation is Debian-based.
+- Generated install commands should pass the API base, node UUID, and runtime
+  token, but leave the WebRTC public domain interactive unless a caller
+  explicitly needs fully non-interactive automation. The installer default is
+  `webrtc.example.com`.
 
 ## Validation
 

@@ -108,13 +108,14 @@ sudo bash scripts/install-kamailio-webrtc.sh
 
 For repeatable installs from the MNSCloud App, use the WebRTC server
 `Generate install command` action. The generated command passes the API base,
-public domain, node UUID, and one-time visible runtime token directly to the
-installer:
+node UUID, and one-time visible runtime token directly to the installer. The
+installer still asks for the edge public domain so each server can use the
+actual WSS domain assigned to that deployment, with `webrtc.example.com` as the
+placeholder default:
 
 ```bash
 sudo bash scripts/install-kamailio-webrtc.sh \
   --api-base https://api.example.com \
-  --public-domain webrtc.example.com \
   --node-uuid 00000000-0000-0000-0000-000000000000 \
   --runtime-token '<shown-once-runtime-token>'
 ```
