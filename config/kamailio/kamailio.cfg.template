@@ -40,5 +40,6 @@ request_route {
 }
 
 onreply_route {
+    xlog("L_INFO", "MNSCloud WebRTC reply status=$rs reason=$rr source=$si to=$tu cseq=$cs ruri=$ru\n");
     route(MNSCLOUD_RTPENGINE_ANSWER);
 }
