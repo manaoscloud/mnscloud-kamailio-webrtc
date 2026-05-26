@@ -143,7 +143,9 @@ ensure_nginx_domain_certificate() {
     return 0
   fi
 
-  if [[ "$provider" == "letsencrypt" && ! -s "$cert" ]] && command -v certbot >/dev/null 2>&1; then
+  if [[ "$provider" == "letsencrypt" ]] \
+    && { [[ ! -s "$cert" || ! -s "$key" ]] || certificate_is_self_signed "$cert"; } \
+    && command -v certbot >/dev/null 2>&1; then
     email="$(nginx_certbot_email)"
     if [[ -n "$email" ]]; then
       install -d -m 0755 "$(nginx_acme_webroot)"
