@@ -269,6 +269,17 @@ render_nginx_config() {
     server_names="$server_names $domain"
   done
 
+  for ((i = 0; i < domain_count; i++)); do
+    domain="$(jq -r ".[$i].domain" <<< "$domains_json")"
+    provider="$(jq -r ".[$i].certificateProvider // \"letsencrypt\"" <<< "$domains_json")"
+    [[ "$domain" == "$server_name" ]] || continue
+    ensure_nginx_domain_certificate "$domain" "$provider"
+    emit_domain_certificate_status "$domain" "$provider"
+    cert="$(nginx_domain_tls_dir "$domain")/fullchain.pem"
+    key="$(nginx_domain_tls_dir "$domain")/privkey.pem"
+    break
+  done
+
   config_tmp="$(mktemp)"
   render_nginx_http_server "$server_names" > "$config_tmp"
   render_nginx_https_server "$server_name" "$cert" "$key" >> "$config_tmp"
