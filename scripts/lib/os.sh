@@ -28,7 +28,8 @@ install_base_packages() {
   run apt-get update -y
   apt_install \
     ca-certificates curl gnupg lsb-release jq uuid-runtime \
-    nginx openssl certbot dnsutils iproute2 netcat-openbsd
+    nginx openssl certbot dnsutils iproute2 iputils-ping \
+    netcat-openbsd ngrep tcpdump traceroute
 }
 
 apt_install() {

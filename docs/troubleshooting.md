@@ -20,6 +20,21 @@ Inspect listeners:
 ss -lntup
 ```
 
+Check PABX SIP reachability from the edge:
+
+```bash
+nc -zvw3 <pabx-host> 5060
+ping -c 3 <pabx-host>
+traceroute <pabx-host>
+```
+
+Trace SIP registration traffic:
+
+```bash
+sudo ngrep -d any -W byline "REGISTER|SIP/2.0" udp port 5060
+sudo tcpdump -ni any host <pabx-host> and port 5060
+```
+
 Check logs:
 
 ```bash
