@@ -42,6 +42,55 @@ nginx_certbot_email() {
   nginx_config_value '.data.parameters[]? | select(.key == "certbot_email") | .value' ''
 }
 
+certificate_is_self_signed() {
+  local cert="$1"
+  local subject issuer
+  [[ -s "$cert" ]] || return 1
+  subject="$(openssl x509 -in "$cert" -noout -subject -nameopt RFC2253 2>/dev/null | sed 's/^subject=//')"
+  issuer="$(openssl x509 -in "$cert" -noout -issuer -nameopt RFC2253 2>/dev/null | sed 's/^issuer=//')"
+  [[ -n "$subject" && "$subject" == "$issuer" ]]
+}
+
+domain_certificate_status() {
+  local domain="$1"
+  local provider="${2:-letsencrypt}"
+  local cert key le_cert le_key
+  cert="$(nginx_domain_tls_dir "$domain")/fullchain.pem"
+  key="$(nginx_domain_tls_dir "$domain")/privkey.pem"
+  le_cert="/etc/letsencrypt/live/$domain/fullchain.pem"
+  le_key="/etc/letsencrypt/live/$domain/privkey.pem"
+
+  if [[ "$provider" == "letsencrypt" && -s "$le_cert" && -s "$le_key" ]]; then
+    printf '%s\n' 'issued'
+    return 0
+  fi
+
+  if [[ ! -s "$cert" || ! -s "$key" ]]; then
+    printf '%s\n' 'failed'
+    return 0
+  fi
+
+  if certificate_is_self_signed "$cert"; then
+    printf '%s\n' 'self_signed'
+    return 0
+  fi
+
+  if [[ "$provider" == "manual" ]]; then
+    printf '%s\n' 'manual'
+    return 0
+  fi
+
+  printf '%s\n' 'issued'
+}
+
+emit_domain_certificate_status() {
+  local domain="$1"
+  local provider="${2:-letsencrypt}"
+  local status
+  status="$(domain_certificate_status "$domain" "$provider")"
+  info "CERT_STATUS domain=$domain status=$status provider=$provider"
+}
+
 nginx_domain_list_json() {
   if [[ -s "$CONFIG_DIR/config.json" ]]; then
     jq -c '[.data.domains[]? | select(.domain and .autoProvision != 0)]' "$CONFIG_DIR/config.json"
@@ -228,6 +277,7 @@ render_nginx_config() {
     [[ -n "$domain" && "$domain" != "null" ]] || continue
     [[ "$domain" != "$server_name" ]] || continue
     ensure_nginx_domain_certificate "$domain" "$provider"
+    emit_domain_certificate_status "$domain" "$provider"
     domain_cert="$(nginx_domain_tls_dir "$domain")/fullchain.pem"
     domain_key="$(nginx_domain_tls_dir "$domain")/privkey.pem"
     render_nginx_https_server "$domain" "$domain_cert" "$domain_key" >> "$config_tmp"
