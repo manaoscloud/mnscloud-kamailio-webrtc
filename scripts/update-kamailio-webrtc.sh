@@ -28,4 +28,5 @@ validate_nginx
 validate_kamailio
 run systemctl reload nginx
 run systemctl restart kamailio
+bootstrap_edge "$server_name"
 ok "WebRTC edge configuration synchronized."

@@ -91,6 +91,7 @@ main() {
   validate_nginx
   validate_kamailio
   enable_services
+  bootstrap_edge "$server_name"
   if [[ -x /opt/mnscloud/mnscloud-agent/scripts/update-agent.sh ]]; then
     info "Refreshing MNSCloud Agent capabilities after WebRTC runtime install."
     bash /opt/mnscloud/mnscloud-agent/scripts/update-agent.sh \

@@ -50,12 +50,57 @@ fetch_edge_config() {
   base="$(api_base)"
   token="$(runtime_token)"
   uuid="$(node_uuid)"
-  run curl -fsSL \
+  info "RUN: curl -fsSL -H Authorization: Bearer <redacted> -H X-WebRTC-Node-UUID: $uuid $base/api/v1/webrtc/edge/config -o $output"
+  curl -fsSL \
     -H "Authorization: Bearer $token" \
     -H "X-WebRTC-Node-UUID: $uuid" \
     "$base/api/v1/webrtc/edge/config" \
     -o "$output"
   jq type "$output" >/dev/null
+}
+
+bootstrap_edge() {
+  local public_domain="$1"
+  local base token uuid hostname public_ip private_ip version base_url payload response_file http_code
+  base="$(api_base)"
+  token="$(runtime_token)"
+  uuid="$(node_uuid)"
+  hostname="$(hostname -f 2>/dev/null || hostname)"
+  public_ip="$(runtime_public_ip "$public_domain" || true)"
+  private_ip="$(runtime_private_ip || true)"
+  version="$(runtime_edge_version || true)"
+  base_url=""
+  [[ -n "$public_domain" ]] && base_url="https://$public_domain"
+
+  payload="$(jq -nc \
+    --arg hostname "$hostname" \
+    --arg publicDomain "$public_domain" \
+    --arg publicIP "$public_ip" \
+    --arg privateIP "$private_ip" \
+    --arg baseUrl "$base_url" \
+    --arg version "$version" \
+    '{hostname:$hostname,publicDomain:$publicDomain,publicIP:$publicIP,privateIP:$privateIP,baseUrl:$baseUrl,version:$version}')"
+  response_file="$(mktemp)"
+  info "RUN: curl -fsS -X POST -H Authorization: Bearer <redacted> -H X-WebRTC-Node-UUID: $uuid $base/api/v1/webrtc/edge/bootstrap"
+  http_code="$(curl -fsS -o "$response_file" -w "%{http_code}" \
+    -X POST \
+    -H "Authorization: Bearer $token" \
+    -H "X-WebRTC-Node-UUID: $uuid" \
+    -H "Content-Type: application/json" \
+    "$base/api/v1/webrtc/edge/bootstrap" \
+    --data "$payload" 2>&1)" || {
+      local error_output="$http_code"
+      warn "WebRTC edge bootstrap failed: ${error_output:-unknown curl error}"
+      rm -f "$response_file"
+      return 0
+    }
+
+  if [[ "$http_code" == "200" ]]; then
+    ok "WebRTC edge runtime metadata synchronized."
+  else
+    warn "WebRTC edge bootstrap returned HTTP $http_code: $(tr '\n' ' ' < "$response_file" | head -c 200)"
+  fi
+  rm -f "$response_file"
 }
 
 runtime_private_ip() {

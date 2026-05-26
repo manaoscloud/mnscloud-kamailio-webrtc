@@ -56,6 +56,16 @@ The sync process fetches:
 GET /api/v1/webrtc/edge/config
 ```
 
+Install and update also post runtime metadata:
+
+```text
+POST /api/v1/webrtc/edge/bootstrap
+```
+
+This keeps the control-plane server record populated with the physical host
+identity, public domain, public/private IPs, base URL, version, and last-seen
+timestamp.
+
 Expected server-side request headers:
 
 ```text

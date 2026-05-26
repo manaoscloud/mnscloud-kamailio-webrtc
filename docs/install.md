@@ -66,6 +66,17 @@ It generates:
 /etc/mnscloud/kamailio-webrtc/node.uuid
 ```
 
+When `--node-uuid` and `--runtime-token` are supplied, the installer validates
+the runtime identity with the MNSCloud API and posts bootstrap metadata to:
+
+```text
+POST /api/v1/webrtc/edge/bootstrap
+```
+
+The bootstrap payload updates the WebRTC server record with hostname, public
+domain, public/private IPs, base URL, version, and last-seen information. The
+update/sync script repeats this metadata sync after applying edge configuration.
+
 The installer also renders Nginx for HTTPS/WSS on `443/tcp`. Trusted TLS
 material should be installed at:
 
