@@ -84,9 +84,9 @@ Supported operating systems:
 - Debian 12
 - Debian 13
 
-The installer uses `mnscloud-runtime-kit` for shared host packages such as Nginx and Certbot, uses
-Debian official repositories for rtpengine, and uses the official Kamailio 6.1 repository for
-Kamailio packages.
+The installer uses `mnscloud-runtime-kit` for shared host packages such as Nginx and upstream
+Certbot Snap, uses Debian official repositories for rtpengine, and uses the official Kamailio 6.1
+repository for Kamailio packages.
 
 Install GitHub CLI if needed:
 [cli/cli installation](https://github.com/cli/cli#installation).

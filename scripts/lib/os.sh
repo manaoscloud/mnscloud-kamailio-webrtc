@@ -31,7 +31,6 @@ install_base_packages() {
 
   load_runtime_kit
   mrtk_install_nginx_package
-  export MNSCLOUD_CERTBOT_NGINX_PLUGIN="${MNSCLOUD_CERTBOT_NGINX_PLUGIN:-false}"
   mrtk_ensure_certbot
 }
 
