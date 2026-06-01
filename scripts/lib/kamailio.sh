@@ -3,10 +3,7 @@ set -Eeuo pipefail
 
 install_kamailio() {
   install_kamailio_repository
-  apt_install \
-    kamailio kamailio-websocket-modules kamailio-tls-modules \
-    kamailio-json-modules kamailio-utils-modules kamailio-extra-modules \
-    kamailio-outbound-modules kamailio-presence-modules
+  MNSCLOUD_KAMAILIO_PACKAGE_PROFILE=webrtc mrtk_ensure_kamailio
 }
 
 render_kamailio_config() {
