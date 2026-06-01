@@ -7,10 +7,10 @@ Supported operating systems:
 - Debian 12
 - Debian 13
 
-The installer configures the official stable nginx.org repository for Nginx, uses Debian official
-repositories for base packages and rtpengine, and installs Kamailio from the official Kamailio 6.1
-APT repository for Debian `bookworm` or `trixie`, with APT pinning so Kamailio packages are not
-silently mixed with older distribution packages.
+The installer uses `mnscloud-runtime-kit` for shared host packages such as Nginx and Certbot, uses
+Debian official repositories for base packages and rtpengine, and installs Kamailio from the
+official Kamailio 6.1 APT repository for Debian `bookworm` or `trixie`, with APT pinning so
+Kamailio packages are not silently mixed with older distribution packages.
 
 APT package installation runs in non-interactive mode and keeps existing local
 configuration files when Debian package prompts appear. The installer writes the
