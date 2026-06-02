@@ -17,6 +17,18 @@ Installs the native MNSCloud Kamailio WebRTC edge runtime.
 TXT
 }
 
+refresh_agent_capabilities() {
+  local api_base="$1"
+  if [[ -x /opt/mnscloud/mnscloud-agent/scripts/install-agent.sh ]]; then
+    info "Refreshing MNSCloud Agent capabilities after WebRTC runtime install."
+    bash /opt/mnscloud/mnscloud-agent/scripts/install-agent.sh \
+      --api-base "$api_base" \
+      --install-label "$(hostname -f 2>/dev/null || hostname)"
+  else
+    warn "MNSCloud Agent source repo not found at /opt/mnscloud/mnscloud-agent; reinstall or restart the Agent manually so it reports webrtc.kamailio.manage."
+  fi
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --api-base)
@@ -91,15 +103,8 @@ main() {
   validate_nginx
   validate_kamailio
   enable_services
+  refresh_agent_capabilities "$api_base"
   bootstrap_edge "$server_name"
-  if [[ -x /opt/mnscloud/mnscloud-agent/scripts/update-agent.sh ]]; then
-    info "Refreshing MNSCloud Agent capabilities after WebRTC runtime install."
-    bash /opt/mnscloud/mnscloud-agent/scripts/update-agent.sh \
-      --api-base "$api_base" \
-      --install-label "$(hostname -f 2>/dev/null || hostname)"
-  else
-    warn "MNSCloud Agent source repo not found at /opt/mnscloud/mnscloud-agent; restart or update the Agent manually so it reports webrtc.kamailio.manage."
-  fi
 
   ok "MNSCloud Kamailio WebRTC Edge installed."
   info "Node UUID: $(node_uuid)"
