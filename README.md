@@ -48,6 +48,11 @@ FreeSWITCH / Asterisk PABX
   fallback.
 - **MNSCloud Cyber Security** is applied separately through the MNSCloud Agent.
 
+This repository owns the WebRTC realtime edge, not the main MNSCloud HTTP
+application edge. Browser UI assets may be published through `mnscloud-nginx`,
+but SIP over WebSocket, Kamailio signaling, rtpengine media anchoring, and
+WebRTC domain certificates stay local to this edge node.
+
 ## Contract
 
 - Product/runtime: `mnscloud-kamailio-webrtc`
@@ -55,6 +60,7 @@ FreeSWITCH / Asterisk PABX
 - Runtime install path: `/opt/mnscloud/kamailio-webrtc`
 - Installer: `scripts/install-kamailio-webrtc.sh`
 - Update command: `scripts/update-kamailio-webrtc.sh`
+- Rollback command: `scripts/rollback-kamailio-webrtc.sh`
 - Validation command: `scripts/validate-kamailio-webrtc.sh`
 - Sync service: `mnscloud-webrtc-sync.service`
 - Sync timer: `mnscloud-webrtc-sync.timer`
@@ -187,6 +193,10 @@ Do not expose these publicly by default:
 rtpengine control port
 Kamailio admin ports
 ```
+
+Do not route RTP/SRTP, TURN/STUN, SFU/video media, rtpengine control, or PABX
+ports through the generic `mnscloud-nginx` HTTP edge. Use this WebRTC edge or a
+future dedicated realtime media module for those responsibilities.
 
 Firewall and security enforcement should be applied through the MNSCloud Cyber
 Security module using the WebRTC Edge profile.

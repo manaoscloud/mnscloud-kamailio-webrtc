@@ -32,6 +32,10 @@ and public-facing text must be written in English.
   interfaces needed to reach the PABX.
 - Keep Kamailio as the signaling SBC, rtpengine as the media relay, and PABX
   servers internal.
+- Keep the WebRTC edge separate from the generic `mnscloud-nginx` HTTP edge.
+  Browser UI assets may be exposed through the HTTP edge, but SIP/WSS,
+  RTP/SRTP, TURN/STUN, SFU/video media, rtpengine control, and PABX exposure
+  must stay in this module or future dedicated realtime modules.
 - Require MNSCloud Agent enrollment before production provisioning. Immediate reconciliation runs
   through `webrtc.kamailio.manage` and `webrtc.edge.sync`.
 - Nginx must be installed from the official stable nginx.org repository.
@@ -49,6 +53,7 @@ After changes, run the relevant shell checks:
 ```bash
 bash -n scripts/install-kamailio-webrtc.sh
 bash -n scripts/update-kamailio-webrtc.sh
+bash -n scripts/rollback-kamailio-webrtc.sh
 bash -n scripts/uninstall-kamailio-webrtc.sh
 ```
 

@@ -23,6 +23,14 @@ business rules.
 Authorization, tenant scope, billing, routing ownership, policy decisions, and secret resolution must
 remain in the MNSCloud API/control plane.
 
+## Realtime Edge Boundary
+
+This repository owns WebRTC SIP/WSS signaling, local WebRTC TLS termination,
+Kamailio routing, and rtpengine media anchoring. Do not move SIP/RTP/TURN/SFU
+behavior into the generic `mnscloud-nginx` HTTP edge. Browser UI clients may be
+published by the HTTP edge, but realtime signaling/media stays in this module
+or future dedicated realtime modules.
+
 ## Paid Contributions
 
 MNSCloud may choose to pay, sponsor, contract, or hire contributors whose work demonstrates strong

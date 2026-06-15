@@ -33,3 +33,8 @@ certificate is installed. This is only a bootstrapping fallback. Public WebRTC
 clients should use a trusted certificate for the edge public domain.
 
 Do not expose Kamailio admin ports or rtpengine control ports publicly.
+
+Do not expose SIP/WSS, RTP/SRTP, TURN/STUN, SFU media, rtpengine control, or
+PABX ports through the generic MNSCloud HTTP edge. Keep private keys on the node
+that terminates the relevant TLS domain, and keep routing ownership in the
+MNSCloud API/control plane.
