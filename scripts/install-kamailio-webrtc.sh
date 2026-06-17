@@ -25,7 +25,7 @@ refresh_agent_capabilities() {
       --api-base "$api_base" \
       --install-label "$(hostname -f 2>/dev/null || hostname)"
   else
-    warn "MNSCloud Agent source repo not found at /opt/mnscloud/mnscloud-agent; reinstall or restart the Agent manually so it reports webrtc.kamailio.manage."
+    warn "MNSCloud Agent source repo not found at /opt/mnscloud/mnscloud-agent; reinstall or restart the Agent manually so it reports realtime.webrtc.manage."
   fi
 }
 

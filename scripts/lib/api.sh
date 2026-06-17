@@ -50,11 +50,11 @@ fetch_edge_config() {
   base="$(api_base)"
   token="$(runtime_token)"
   uuid="$(node_uuid)"
-  info "RUN: curl -fsSL -H Authorization: Bearer <redacted> -H X-WebRTC-Node-UUID: $uuid $base/api/v1/webrtc/edge/config -o $output"
+  info "RUN: curl -fsSL -H Authorization: Bearer <redacted> -H X-WebRTC-Node-UUID: $uuid $base/api/v1/realtime/webrtc/edge/config -o $output"
   curl -fsSL \
     -H "Authorization: Bearer $token" \
     -H "X-WebRTC-Node-UUID: $uuid" \
-    "$base/api/v1/webrtc/edge/config" \
+    "$base/api/v1/realtime/webrtc/edge/config" \
     -o "$output"
   jq type "$output" >/dev/null
 }
@@ -81,13 +81,13 @@ bootstrap_edge() {
     --arg version "$version" \
     '{hostname:$hostname,publicDomain:$publicDomain,publicIP:$publicIP,privateIP:$privateIP,baseUrl:$baseUrl,version:$version}')"
   response_file="$(mktemp)"
-  info "RUN: curl -fsS -X POST -H Authorization: Bearer <redacted> -H X-WebRTC-Node-UUID: $uuid $base/api/v1/webrtc/edge/bootstrap"
+  info "RUN: curl -fsS -X POST -H Authorization: Bearer <redacted> -H X-WebRTC-Node-UUID: $uuid $base/api/v1/realtime/webrtc/edge/bootstrap"
   http_code="$(curl -fsS -o "$response_file" -w "%{http_code}" \
     -X POST \
     -H "Authorization: Bearer $token" \
     -H "X-WebRTC-Node-UUID: $uuid" \
     -H "Content-Type: application/json" \
-    "$base/api/v1/webrtc/edge/bootstrap" \
+    "$base/api/v1/realtime/webrtc/edge/bootstrap" \
     --data "$payload" 2>&1)" || {
       local error_output="$http_code"
       warn "WebRTC edge bootstrap failed: ${error_output:-unknown curl error}"

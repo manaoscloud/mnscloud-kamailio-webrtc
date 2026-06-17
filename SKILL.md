@@ -17,7 +17,7 @@ and public-facing text must be written in English.
   `10.0.0.10`.
 - Keep tenant authorization, billing rules, routing ownership, and secret
   resolution in the MNSCloud API/control plane.
-- The edge consumes `GET /api/v1/webrtc/edge/config` and renders local service
+- The edge consumes `GET /api/v1/realtime/webrtc/edge/config` and renders local service
   configuration from that response.
 
 ## Architecture Rules
@@ -37,7 +37,7 @@ and public-facing text must be written in English.
   RTP/SRTP, TURN/STUN, SFU/video media, rtpengine control, and PABX exposure
   must stay in this module or future dedicated realtime modules.
 - Require MNSCloud Agent enrollment before production provisioning. Immediate reconciliation runs
-  through `webrtc.kamailio.manage` and `webrtc.edge.sync`.
+  through `realtime.webrtc.manage` and `realtime.webrtc.sync`.
 - Nginx must be installed from the official stable nginx.org repository.
 - The current full WebRTC installer supports Debian 12/13 because Kamailio and
   rtpengine package installation is Debian-based.

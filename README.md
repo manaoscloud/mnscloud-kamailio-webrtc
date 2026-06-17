@@ -42,9 +42,9 @@ FreeSWITCH / Asterisk PABX
 - **rtpengine** anchors and bridges media between browser WebRTC
   ICE/DTLS-SRTP and traditional PABX RTP/SRTP.
 - **MNSCloud API** is the control plane and provides dynamic edge configuration
-  through `GET /api/v1/webrtc/edge/config`.
+  through `GET /api/v1/realtime/webrtc/edge/config`.
 - **MNSCloud Agent** can optionally apply domain changes immediately through a
-  typed `webrtc.edge.sync` job while the local timer remains the reconciliation
+  typed `realtime.webrtc.sync` job while the local timer remains the reconciliation
   fallback.
 - **MNSCloud Cyber Security** is applied separately through the MNSCloud Agent.
 
@@ -64,8 +64,8 @@ WebRTC domain certificates stay local to this edge node.
 - Validation command: `scripts/validate-kamailio-webrtc.sh`
 - Sync service: `mnscloud-webrtc-sync.service`
 - Sync timer: `mnscloud-webrtc-sync.timer`
-- Optional Agent capability: `webrtc.kamailio.manage`
-- Optional Agent command: `webrtc.edge.sync`
+- Optional Agent capability: `realtime.webrtc.manage`
+- Optional Agent command: `realtime.webrtc.sync`
 - Core services: `nginx.service`, `kamailio.service`, `rtpengine.service`
 - Configuration directory: `/etc/mnscloud/kamailio-webrtc`
 - State directory: `/var/lib/mnscloud/kamailio-webrtc`
@@ -79,7 +79,7 @@ WebRTC domain certificates stay local to this edge node.
 - Generated Kamailio listeners: `/etc/kamailio/mnscloud/mnscloud-listen.cfg`
 - Generated PABX routes: `/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg`
 - rtpengine config: `/etc/rtpengine/rtpengine.conf`
-- Edge config endpoint: `/api/v1/webrtc/edge/config`
+- Edge config endpoint: `/api/v1/realtime/webrtc/edge/config`
 - Public WSS port: `443/tcp`
 - Public RTP range: `30000-40000/udp`
 
@@ -133,7 +133,7 @@ The installer creates a node UUID and stores local configuration under:
 ```
 
 Before installing the WebRTC edge, enroll `mnscloud-agent` and confirm it is online with
-`webrtc.kamailio.manage`. Edge sync, domain provisioning, and certificate issuance are executed
+`realtime.webrtc.manage`. Edge sync, domain provisioning, and certificate issuance are executed
 through Agent jobs; the app does not expose server install credentials.
 
 Nginx publishes WebRTC traffic on `443/tcp` and proxies `/ws` to the local

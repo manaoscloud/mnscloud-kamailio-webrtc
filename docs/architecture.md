@@ -28,7 +28,7 @@ The MNSCloud API is the control plane. The edge fetches dynamic configuration
 from:
 
 ```text
-GET /api/v1/webrtc/edge/config
+GET /api/v1/realtime/webrtc/edge/config
 ```
 
 The response describes domains, PABX targets, RTP ranges, and edge policy.

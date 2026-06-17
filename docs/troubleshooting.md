@@ -45,7 +45,7 @@ journalctl -u nginx -n 200 --no-pager
 
 Common issues:
 
-- Assigned Agent is offline or missing `webrtc.kamailio.manage`
+- Assigned Agent is offline or missing `realtime.webrtc.manage`
 - Public DNS not pointing to the edge server
 - TLS not configured yet
 - Cyber Security profile not applied for RTP UDP range

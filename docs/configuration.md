@@ -32,7 +32,7 @@ Nginx renders `/health` on HTTP and HTTPS, redirects regular HTTP traffic to
 HTTPS, and proxies secure WebSocket traffic from `https://<public-domain>/ws`
 to the local Kamailio WebSocket listener.
 
-The sync process also renders active `VoipWebRtcDomain` records returned by the
+The sync process also renders active `RealtimeWebRtcDomain` records returned by the
 API. Each active auto-provisioned domain gets a dedicated HTTPS/WSS server block
 on `443/tcp` using SNI. The edge supports:
 
@@ -53,13 +53,13 @@ edge and port `80/tcp` must reach Nginx. The edge serves ACME challenges from:
 The sync process fetches:
 
 ```text
-GET /api/v1/webrtc/edge/config
+GET /api/v1/realtime/webrtc/edge/config
 ```
 
 Install and update also post runtime metadata:
 
 ```text
-POST /api/v1/webrtc/edge/bootstrap
+POST /api/v1/realtime/webrtc/edge/bootstrap
 ```
 
 This keeps the control-plane server record populated with the physical host

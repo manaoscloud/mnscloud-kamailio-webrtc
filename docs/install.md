@@ -74,7 +74,7 @@ When `--node-uuid` and `--runtime-token` are supplied, the installer validates
 the runtime identity with the MNSCloud API and posts bootstrap metadata to:
 
 ```text
-POST /api/v1/webrtc/edge/bootstrap
+POST /api/v1/realtime/webrtc/edge/bootstrap
 ```
 
 The bootstrap payload updates the WebRTC server record with hostname, public
@@ -94,7 +94,7 @@ certificate so Nginx can start. Browser WebRTC clients require a trusted
 certificate, so replace the temporary certificate before production use.
 
 Additional public WSS domains can be registered in MNSCloud under
-`VoIP > WebRTC > Domain`. The sync service renders those domains on the same
+`Realtime > WebRTC > Domain`. The sync service renders those domains on the same
 edge server and can issue Let’s Encrypt certificates when:
 
 - DNS `A`/`AAAA` records point to the WebRTC edge.
@@ -104,13 +104,13 @@ edge server and can issue Let’s Encrypt certificates when:
   `certbot_email`, then the tenant/user email, then `no-reply@manaos.cloud`.
 
 For production provisioning, enroll `mnscloud-agent` first and confirm it is
-online with the `webrtc.kamailio.manage` capability. WebRTC domain, certificate,
+online with the `realtime.webrtc.manage` capability. WebRTC domain, certificate,
 and edge sync work is then delivered as Agent jobs. The app may show only a
 short-lived Agent enrollment token; the long-lived Agent runtime token is issued
 directly to the server during `POST /api/v1/agent/enroll`.
 
 Provisioning is Agent-first. The WebRTC server must be assigned to an online
-`mnscloud-agent` with `webrtc.kamailio.manage`; configuration sync, domain
+`mnscloud-agent` with `realtime.webrtc.manage`; configuration sync, domain
 provisioning, and certificate work are delivered as Agent jobs and recorded in
 Activity Logs.
 
