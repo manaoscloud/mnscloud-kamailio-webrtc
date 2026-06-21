@@ -38,6 +38,12 @@ interface=10.0.0.10!203.0.113.10;2001:db8::10
 If no routable local address can be detected, the installer falls back to
 `interface=any`, which lets rtpengine select non-loopback local addresses.
 
+Kamailio private SIP listeners are rendered from the runtime config returned by
+the API. During a first clean install, that config may not contain the node
+private IP until the bootstrap callback completes; in that case the installer
+uses the local IPv4 source address from the default route and only renders it
+when that address is assigned to the host.
+
 Run:
 
 ```bash
