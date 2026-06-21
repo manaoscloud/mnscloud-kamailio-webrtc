@@ -59,7 +59,7 @@ WebRTC domain certificates stay local to this edge node.
 - Project directory: `/opt/mnscloud/mnscloud-kamailio-webrtc`
 - Runtime install path: `/opt/mnscloud/kamailio-webrtc`
 - Installer: `scripts/install-kamailio-webrtc.sh`
-- Update command: `scripts/update-kamailio-webrtc.sh`
+- Update command: `scripts/update-latest-kamailio-webrtc.sh`
 - Rollback command: `scripts/rollback-kamailio-webrtc.sh`
 - Validation command: `scripts/validate-kamailio-webrtc.sh`
 - Sync service: `mnscloud-webrtc-sync.service`
@@ -153,6 +153,17 @@ After installation, configuration can be synchronized with:
 ```bash
 sudo systemctl restart mnscloud-webrtc-sync.service
 sudo systemctl status kamailio rtpengine nginx --no-pager
+sudo bash /opt/mnscloud/kamailio-webrtc/scripts/validate-kamailio-webrtc.sh
+```
+
+## Update
+
+Update the checked-out runtime to the latest approved release and resynchronize edge
+configuration:
+
+```bash
+cd /opt/mnscloud/mnscloud-kamailio-webrtc
+sudo ./scripts/update-latest-kamailio-webrtc.sh
 sudo bash /opt/mnscloud/kamailio-webrtc/scripts/validate-kamailio-webrtc.sh
 ```
 
