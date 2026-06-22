@@ -8,9 +8,10 @@ Supported operating systems:
 - Debian 13
 
 The installer uses `mnscloud-runtime-kit` for shared host packages such as Nginx and upstream
-Certbot Snap, uses Debian official repositories for base packages and rtpengine, and installs
-Kamailio from the official Kamailio 6.1 APT repository for Debian `bookworm` or `trixie`, with APT
-pinning so Kamailio packages are not silently mixed with older distribution packages.
+Certbot Snap, and installs Kamailio from the official Kamailio 6.1 APT repository for Debian
+`bookworm` or `trixie`, with APT pinning so Kamailio packages are not silently mixed with older
+distribution packages. rtpengine packages and media service lifecycle are owned by
+`mnscloud-media`.
 
 APT package installation runs in non-interactive mode and keeps existing local
 configuration files when Debian package prompts appear. The installer writes the
@@ -20,23 +21,9 @@ The base package set includes runtime dependencies and focused troubleshooting
 tools: `dnsutils`, `iproute2`, `iputils-ping`, `netcat-openbsd`, `ngrep`,
 `tcpdump`, and `traceroute`.
 
-Before installing rtpengine, the installer attempts to install the matching
-`linux-headers-$(uname -r)` package so the rtpengine DKMS kernel module can be
-built when the provider publishes compatible headers. If the matching package is
-not available, installation continues and rtpengine runs in userspace mode.
-
-The installer derives the rtpengine media interface from local routing and the
-WebRTC edge public domain. If the node has a private IPv4 address and the public
-domain resolves to a different IPv4 address, rtpengine is configured with the
-official `local!advertised` syntax. If the node also has a routed IPv6 address,
-it is added to the same `interface` line. Example:
-
-```ini
-interface=10.0.0.10!203.0.113.10;2001:db8::10
-```
-
-If no routable local address can be detected, the installer falls back to
-`interface=any`, which lets rtpengine select non-loopback local addresses.
+The installer renders Kamailio with the media control socket returned by the API
+runtime config. If the API does not provide one yet, Kamailio defaults to
+`udp:127.0.0.1:2223` so a colocated media runtime can work during development.
 
 Kamailio private SIP listeners are rendered from the runtime config returned by
 the API. During a first clean install, that config may not contain the node
@@ -134,7 +121,7 @@ sudo systemctl restart mnscloud-webrtc-sync.service
 
 ## Validate Runtime
 
-After install or update, validate rendered configuration and core service health:
+After install or update, validate rendered configuration and core signaling service health:
 
 ```bash
 sudo bash /opt/mnscloud/kamailio-webrtc/scripts/validate-kamailio-webrtc.sh

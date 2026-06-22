@@ -11,8 +11,6 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$REPO_DIR/scripts/lib/kamailio.sh"
 # shellcheck source=scripts/lib/nginx.sh
 . "$REPO_DIR/scripts/lib/nginx.sh"
-# shellcheck source=scripts/lib/rtpengine.sh
-. "$REPO_DIR/scripts/lib/rtpengine.sh"
 # shellcheck source=scripts/lib/validation.sh
 . "$REPO_DIR/scripts/lib/validation.sh"
 
@@ -22,8 +20,7 @@ Usage:
   sudo ./scripts/rollback-kamailio-webrtc.sh --ref <known-good-git-ref>
 
 Rolls the local WebRTC edge runtime back to an explicit Git tag or commit,
-syncs generated configuration from the API, and validates Nginx, Kamailio, and
-rtpengine.
+syncs generated configuration from the API, and validates Nginx and Kamailio.
 TXT
 }
 
@@ -71,17 +68,11 @@ install -m 0600 "$CONFIG_TMP" "$CONFIG_DIR/config.json"
 
 render_nginx_config "$server_name"
 render_kamailio_config
-render_rtpengine_config "$server_name"
 
 validate_nginx
 validate_kamailio
 run systemctl reload nginx
 run systemctl restart kamailio
-if systemctl list-unit-files rtpengine.service >/dev/null 2>&1; then
-  run systemctl restart rtpengine
-elif systemctl list-unit-files rtpengine-daemon.service >/dev/null 2>&1; then
-  run systemctl restart rtpengine-daemon
-fi
 health_check
 bootstrap_edge "$server_name"
 

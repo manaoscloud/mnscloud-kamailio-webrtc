@@ -19,7 +19,7 @@ Protected services:
 - SSH
 - Nginx
 - Kamailio
-- rtpengine
+- rtpengine on dedicated `mnscloud-media` nodes
 
 Recommended public ports:
 

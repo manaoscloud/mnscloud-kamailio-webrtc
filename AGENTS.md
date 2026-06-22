@@ -26,10 +26,10 @@ remain in the MNSCloud API/control plane.
 ## Realtime Edge Boundary
 
 This repository owns WebRTC SIP/WSS signaling, local WebRTC TLS termination,
-Kamailio routing, and rtpengine media anchoring. Do not move SIP/RTP/TURN/SFU
+and Kamailio routing. RTP/SRTP relay belongs to `mnscloud-media`; TURN/STUN and
+SFU behavior belong to their dedicated realtime modules. Do not move realtime
 behavior into the generic `mnscloud-nginx` HTTP edge. Browser UI clients may be
-published by the HTTP edge, but realtime signaling/media stays in this module
-or future dedicated realtime modules.
+published by the HTTP edge.
 
 ## Paid Contributions
 

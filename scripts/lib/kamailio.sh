@@ -13,6 +13,7 @@ render_kamailio_config() {
   for file in "$KAMAILIO_MNS_DIR/"*.template; do
     mv "$file" "${file%.template}"
   done
+  render_kamailio_rtpengine_socket
   render_kamailio_listeners
   render_kamailio_pabx_routes
 }
@@ -72,6 +73,36 @@ detect_kamailio_private_ipv4() {
     }')"
   [[ -n "$detected_ip" ]] || return 0
   printf '%s\n' "$detected_ip"
+}
+
+render_kamailio_rtpengine_socket() {
+  local config_file="$CONFIG_DIR/config.json"
+  local output_file="$KAMAILIO_MNS_DIR/mnscloud-rtpengine.cfg"
+  local socket
+
+  socket="udp:127.0.0.1:2223"
+  if [[ -s "$config_file" ]]; then
+    socket="$(jq -r '(
+        .server.rtpengineSocket
+        // .server.mediaSocket
+        // .data.server.rtpengineSocket
+        // .data.server.mediaSocket
+        // .media.rtpengineSocket
+        // .data.media.rtpengineSocket
+        // ""
+      )' "$config_file" 2>/dev/null | tr -d '\r\n')"
+    socket="${socket:-udp:127.0.0.1:2223}"
+  fi
+
+  if [[ ! "$socket" =~ ^(udp|tcp):[A-Za-z0-9._:-]+:[0-9]{1,5}$ ]]; then
+    warn "Invalid rtpengine socket from runtime config; using udp:127.0.0.1:2223."
+    socket="udp:127.0.0.1:2223"
+  fi
+
+  sed "s#{{RTPENGINE_SOCKET}}#${socket}#g" "$output_file" > "${output_file}.tmp"
+  install -m 0644 "${output_file}.tmp" "$output_file"
+  rm -f "${output_file}.tmp"
+  ok "Kamailio rtpengine socket: ${socket}"
 }
 
 render_kamailio_pabx_routes() {

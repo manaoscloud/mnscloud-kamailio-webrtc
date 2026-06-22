@@ -13,5 +13,4 @@ install_systemd_units() {
 enable_services() {
   run systemctl enable --now nginx
   run systemctl enable --now kamailio
-  run systemctl enable --now rtpengine
 }

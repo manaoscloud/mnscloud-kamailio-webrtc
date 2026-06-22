@@ -64,7 +64,6 @@ done
 . "$REPO_DIR/scripts/lib/os.sh"
 . "$REPO_DIR/scripts/lib/api.sh"
 . "$REPO_DIR/scripts/lib/kamailio.sh"
-. "$REPO_DIR/scripts/lib/rtpengine.sh"
 . "$REPO_DIR/scripts/lib/nginx.sh"
 . "$REPO_DIR/scripts/lib/systemd.sh"
 . "$REPO_DIR/scripts/lib/validation.sh"
@@ -93,11 +92,9 @@ main() {
 
   install_base_packages
   install_kamailio
-  install_rtpengine
 
   render_nginx_config "$server_name"
   render_kamailio_config
-  render_rtpengine_config "$server_name"
   install_systemd_units
 
   validate_nginx

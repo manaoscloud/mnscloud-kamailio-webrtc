@@ -25,9 +25,9 @@ Local Nginx
         |
 Kamailio WebRTC Edge
         |
-        | rtpengine control
+        | rtpengine NG control socket
         |
-rtpengine
+MNSCloud Media Edge (rtpengine)
         |
         | SIP / RTP internal network
         |
@@ -38,9 +38,9 @@ FreeSWITCH / Asterisk PABX
 
 - **Nginx** terminates TLS and proxies WSS traffic to Kamailio.
 - **Kamailio** handles SIP signaling, tenant/domain routing, WebRTC headers, and
-  rtpengine integration.
-- **rtpengine** anchors and bridges media between browser WebRTC
-  ICE/DTLS-SRTP and traditional PABX RTP/SRTP.
+  rtpengine NG socket integration.
+- **MNSCloud Media Edge** (`mnscloud-media`) owns rtpengine installation,
+  service lifecycle, and RTP/SRTP relay behavior.
 - **MNSCloud API** is the control plane and provides dynamic edge configuration
   through `GET /api/v1/realtime/webrtc/edge/config`.
 - **MNSCloud Agent** can optionally apply domain changes immediately through a
@@ -48,10 +48,10 @@ FreeSWITCH / Asterisk PABX
   fallback.
 - **MNSCloud Cyber Security** is applied separately through the MNSCloud Agent.
 
-This repository owns the WebRTC realtime edge, not the main MNSCloud HTTP
-application edge. Browser UI assets may be published through `mnscloud-nginx`,
-but SIP over WebSocket, Kamailio signaling, rtpengine media anchoring, and
-WebRTC domain certificates stay local to this edge node.
+This repository owns the WebRTC signaling edge, not the main MNSCloud HTTP
+application edge and not the dedicated media runtime. Browser UI assets may be
+published through `mnscloud-nginx`, SIP over WebSocket and Kamailio signaling
+stay in this module, and RTP/SRTP media relay stays in `mnscloud-media`.
 
 ## Contract
 
@@ -66,7 +66,7 @@ WebRTC domain certificates stay local to this edge node.
 - Sync timer: `mnscloud-webrtc-sync.timer`
 - Optional Agent capability: `realtime.webrtc.manage`
 - Optional Agent command: `realtime.webrtc.sync`
-- Core services: `nginx.service`, `kamailio.service`, `rtpengine.service`
+- Core services: `nginx.service`, `kamailio.service`
 - Configuration directory: `/etc/mnscloud/kamailio-webrtc`
 - State directory: `/var/lib/mnscloud/kamailio-webrtc`
 - Log directory: `/var/log/mnscloud/kamailio-webrtc`
@@ -78,10 +78,10 @@ WebRTC domain certificates stay local to this edge node.
 - Kamailio config: `/etc/kamailio/kamailio.cfg`
 - Generated Kamailio listeners: `/etc/kamailio/mnscloud/mnscloud-listen.cfg`
 - Generated PABX routes: `/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg`
-- rtpengine config: `/etc/rtpengine/rtpengine.conf`
+- Generated rtpengine socket include: `/etc/kamailio/mnscloud/mnscloud-rtpengine.cfg`
 - Edge config endpoint: `/api/v1/realtime/webrtc/edge/config`
 - Public WSS port: `443/tcp`
-- Public RTP range: `30000-40000/udp`
+- Media relay: dedicated `mnscloud-media` nodes, normally `30000-40000/udp`
 
 ## Install
 
@@ -91,7 +91,8 @@ Supported operating systems:
 - Debian 13
 
 The installer uses `mnscloud-runtime-kit` for shared host packages such as Nginx, upstream Certbot
-Snap, and Kamailio 6.1 packages. It uses Debian official repositories for rtpengine.
+Snap, and Kamailio 6.1 packages. rtpengine is installed and operated by the dedicated
+`mnscloud-media` runtime.
 
 Install GitHub CLI if needed:
 [cli/cli installation](https://github.com/cli/cli#installation).
@@ -152,7 +153,7 @@ After installation, configuration can be synchronized with:
 
 ```bash
 sudo systemctl restart mnscloud-webrtc-sync.service
-sudo systemctl status kamailio rtpengine nginx --no-pager
+sudo systemctl status kamailio nginx --no-pager
 sudo bash /opt/mnscloud/kamailio-webrtc/scripts/validate-kamailio-webrtc.sh
 ```
 
@@ -193,7 +194,7 @@ Recommended public exposure:
 
 ```text
 443/tcp                 WebRTC WSS through Nginx
-30000-40000/udp         RTP media range, configurable
+30000-40000/udp         RTP media range on dedicated mnscloud-media nodes
 ```
 
 Do not expose these publicly by default:
@@ -201,13 +202,13 @@ Do not expose these publicly by default:
 ```text
 5060/udp and 5060/tcp on public interfaces
 5061/tcp
-rtpengine control port
+rtpengine control port on the media node
 Kamailio admin ports
 ```
 
 Do not route RTP/SRTP, TURN/STUN, SFU/video media, rtpengine control, or PABX
-ports through the generic `mnscloud-nginx` HTTP edge. Use this WebRTC edge or a
-future dedicated realtime media module for those responsibilities.
+ports through the generic `mnscloud-nginx` HTTP edge. Use this WebRTC signaling
+edge plus dedicated realtime media modules for those responsibilities.
 
 Firewall and security enforcement should be applied through the MNSCloud Cyber
 Security module using the WebRTC Edge profile.

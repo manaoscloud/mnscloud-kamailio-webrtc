@@ -1,15 +1,15 @@
 # Architecture
 
-MNSCloud Kamailio WebRTC Edge is a public signaling and media edge for
-multi-tenant WebRTC access.
+MNSCloud Kamailio WebRTC Edge is a public signaling edge for multi-tenant
+WebRTC access.
 
 The PABX remains internal. The edge receives browser WebRTC traffic and forwards
 validated SIP signaling to the correct FreeSWITCH or Asterisk target.
 
 This module is separate from the `mnscloud-nginx` HTTP application edge.
 `mnscloud-nginx` may publish browser UI clients and `/api/v1`, while this edge
-terminates WebRTC SIP/WSS domains, applies Kamailio signaling policy, and
-coordinates rtpengine media anchoring.
+terminates WebRTC SIP/WSS domains and applies Kamailio signaling policy. RTP
+media relay is owned by dedicated `mnscloud-media` nodes.
 
 ## Identity
 
@@ -31,15 +31,16 @@ from:
 GET /api/v1/realtime/webrtc/edge/config
 ```
 
-The response describes domains, PABX targets, RTP ranges, and edge policy.
+The response describes domains, PABX targets, the rtpengine NG control socket,
+and edge policy.
 
 ## Data Plane
 
-Kamailio handles signaling. rtpengine handles media.
+Kamailio handles signaling. Dedicated media nodes handle RTP/SRTP relay.
 
 ```text
 WSS -> Nginx -> Kamailio -> PABX
-             -> rtpengine -> RTP/SRTP media
+             -> mnscloud-media / rtpengine -> RTP/SRTP media
 ```
 
 The Nginx process in this diagram is local to the WebRTC edge host. It is not
@@ -60,9 +61,10 @@ WebRTC edge:
 - SIP over secure WebSocket.
 - WebRTC SIP domain certificates.
 - Kamailio routing, authentication hooks, and tenant/domain signaling policy.
-- rtpengine media anchoring.
+- rtpengine NG socket integration.
 
 Media edge:
 
-- Future TURN/STUN and SFU/video media should be dedicated realtime modules,
-  not generic Nginx locations.
+- RTP/SRTP media relay through `mnscloud-media`.
+- TURN/STUN and SFU/video media stay in dedicated realtime modules, not generic
+  Nginx locations.

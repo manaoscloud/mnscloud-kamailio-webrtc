@@ -30,8 +30,8 @@ and public-facing text must be written in English.
 - Generate Kamailio listeners from runtime config. Public WebSocket traffic
   terminates on Nginx, while SIP listeners must stay on loopback/private
   interfaces needed to reach the PABX.
-- Keep Kamailio as the signaling SBC, rtpengine as the media relay, and PABX
-  servers internal.
+- Keep Kamailio as the signaling SBC and PABX servers internal. RTP/SRTP media
+  relay belongs to the dedicated `mnscloud-media` runtime.
 - Keep the WebRTC edge separate from the generic `mnscloud-nginx` HTTP edge.
   Browser UI assets may be exposed through the HTTP edge, but SIP/WSS,
   RTP/SRTP, TURN/STUN, SFU/video media, rtpengine control, and PABX exposure
@@ -39,8 +39,9 @@ and public-facing text must be written in English.
 - Require MNSCloud Agent enrollment before production provisioning. Immediate reconciliation runs
   through `realtime.webrtc.manage` and `realtime.webrtc.sync`.
 - Nginx must be installed from the official stable nginx.org repository.
-- The current full WebRTC installer supports Debian 12/13 because Kamailio and
-  rtpengine package installation is Debian-based.
+- The current WebRTC installer supports Debian 12/13 because Kamailio package
+  installation is Debian-based. rtpengine package installation is owned by
+  `mnscloud-media`.
 - Generated install commands should pass the API base, node UUID, and runtime
   token, but leave the WebRTC public domain interactive unless a caller
   explicitly needs fully non-interactive automation. The installer default is
