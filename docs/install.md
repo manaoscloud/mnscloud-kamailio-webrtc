@@ -96,11 +96,12 @@ edge server and can issue Let’s Encrypt certificates when:
 - The API returns `certbotEmail`. It resolves this from WebRTC parameter
   `certbot_email`, then the tenant/user email, then `no-reply@manaos.cloud`.
 
-For production provisioning, enroll `mnscloud-agent` first and confirm it is
-online with the `realtime.webrtc.manage` capability. WebRTC domain, certificate,
-and edge sync work is then delivered as Agent jobs. The app may show only a
-short-lived Agent enrollment token; the long-lived Agent runtime token is issued
-directly to the server during `POST /api/v1/agent/enroll`.
+For production provisioning, enroll `mnscloud-agent` first. The installer calls
+`/opt/mnscloud/mnscloud-agent/scripts/validate-agent.sh --require-active --require-enrolled
+--require-job realtime.webrtc.edge` before installing the WebRTC edge. WebRTC domain, certificate,
+and edge sync work is then delivered as Agent jobs. The app may show only a short-lived Agent
+enrollment token; the long-lived Agent runtime token is issued directly to the server during
+`POST /api/v1/agent/enroll`.
 
 Provisioning is Agent-first. The WebRTC server must be assigned to an online
 `mnscloud-agent` with `realtime.webrtc.manage`; configuration sync, domain

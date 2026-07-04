@@ -133,9 +133,11 @@ The installer creates a node UUID and stores local configuration under:
 /etc/mnscloud/kamailio-webrtc/
 ```
 
-Before installing the WebRTC edge, enroll `mnscloud-agent` and confirm it is online with
-`realtime.webrtc.manage`. Edge sync, domain provisioning, and certificate issuance are executed
-through Agent jobs; the app does not expose server install credentials.
+Before installing the WebRTC edge, enroll `mnscloud-agent`. The installer validates the shared
+Agent prerequisite contract with `/opt/mnscloud/mnscloud-agent/scripts/validate-agent.sh
+--require-active --require-enrolled --require-job realtime.webrtc.edge`. Edge sync, domain
+provisioning, and certificate issuance are executed through Agent jobs; the app does not expose
+server install credentials.
 
 Nginx publishes WebRTC traffic on `443/tcp` and proxies `/ws` to the local
 Kamailio WebSocket listener. If no certificate exists under

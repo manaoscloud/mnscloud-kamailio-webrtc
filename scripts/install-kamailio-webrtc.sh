@@ -7,6 +7,7 @@ API_BASE="${MNSCLOUD_API_BASE:-}"
 PUBLIC_DOMAIN="${MNSCLOUD_WEBRTC_PUBLIC_DOMAIN:-}"
 NODE_UUID="${MNSCLOUD_WEBRTC_NODE_UUID:-}"
 RUNTIME_TOKEN="${MNSCLOUD_WEBRTC_RUNTIME_TOKEN:-}"
+AGENT_VALIDATOR="/opt/mnscloud/mnscloud-agent/scripts/validate-agent.sh"
 
 usage() {
   cat <<'TXT'
@@ -27,6 +28,13 @@ refresh_agent_capabilities() {
   else
     warn "MNSCloud Agent source repo not found at /opt/mnscloud/mnscloud-agent; reinstall or restart the Agent manually so it reports realtime.webrtc.manage."
   fi
+}
+
+validate_mnscloud_agent() {
+  if [[ ! -x "$AGENT_VALIDATOR" ]]; then
+    die "mnscloud-agent validator not found at ${AGENT_VALIDATOR}. Update/reinstall the Agent before installing the WebRTC edge."
+  fi
+  bash "$AGENT_VALIDATOR" --require-active --require-enrolled --require-job realtime.webrtc.edge
 }
 
 while [[ $# -gt 0 ]]; do
@@ -76,9 +84,7 @@ main() {
   save_node_uuid "$NODE_UUID"
   ensure_uuid_file "$CONFIG_DIR/node.uuid"
   info "Node UUID: $(node_uuid)"
-  if ! systemctl is-active --quiet mnscloud-agent; then
-    die "mnscloud-agent must be installed, enrolled, and active before installing the WebRTC edge."
-  fi
+  validate_mnscloud_agent
 
   local api_base server_name
   api_base="${API_BASE:-$(prompt_default "MNSCloud API base URL" "https://api.example.com")}"
