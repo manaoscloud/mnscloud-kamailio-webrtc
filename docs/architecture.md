@@ -3,8 +3,9 @@
 MNSCloud Kamailio WebRTC Edge is a public signaling edge for multi-tenant
 WebRTC access.
 
-The PABX remains internal. The edge receives browser WebRTC traffic and forwards
-validated SIP signaling to the correct FreeSWITCH or Asterisk target.
+PABX and Softswitch runtimes remain internal. The edge receives browser WebRTC
+traffic and forwards validated SIP signaling to the explicit SIP target selected
+for the requested WebRTC domain.
 
 This module is separate from the `mnscloud-nginx` HTTP application edge.
 `mnscloud-nginx` may publish browser UI clients and `/api/v1`, while this edge
@@ -31,7 +32,7 @@ from:
 GET /api/v1/realtime/webrtc/edge/config
 ```
 
-The response describes domains, PABX targets, the rtpengine NG control socket,
+The response describes domains, SIP targets, the rtpengine NG control socket,
 and edge policy.
 
 ## Data Plane
@@ -39,7 +40,7 @@ and edge policy.
 Kamailio handles signaling. Dedicated media nodes handle RTP/SRTP relay.
 
 ```text
-WSS -> Nginx -> Kamailio -> PABX
+WSS -> Nginx -> Kamailio -> PABX or Softswitch
              -> mnscloud-media / rtpengine -> RTP/SRTP media
 ```
 

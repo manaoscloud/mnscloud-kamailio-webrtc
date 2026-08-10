@@ -48,7 +48,7 @@ Common issues:
 - Public DNS not pointing to the edge server
 - TLS not configured yet
 - Cyber Security profile not applied for RTP UDP range on the media node
-- PABX target unreachable from the edge server
+- PABX or Softswitch SIP target unreachable from the edge server
 - Kamailio module initialization errors:
   - `nathelper ... can't find usrloc module` means the template is missing the
     `usrloc` dependency required for NAT ping support.

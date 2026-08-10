@@ -24,12 +24,13 @@ and public-facing text must be written in English.
 
 - The canonical WebRTC identity is `extension@domain`.
 - Never authenticate or route by extension username alone.
-- Render domain-based PABX routing from the API `pabxTargets` runtime payload.
-  If a domain has no target, Kamailio must fail closed with `No PABX target`
+- Render domain-based SIP routing from the API `sipTargets` runtime payload.
+  Targets may be `pabx` or `softswitch`. If a domain has no target, Kamailio
+  must fail closed with `No realtime SIP target`
   instead of using stale dispatcher state or forwarding back to itself.
 - Generate Kamailio listeners from runtime config. Public WebSocket traffic
   terminates on Nginx, while SIP listeners must stay on loopback/private
-  interfaces needed to reach the PABX.
+  interfaces needed to reach the internal PABX or Softswitch target.
 - Keep Kamailio as the signaling SBC and PABX servers internal. RTP/SRTP media
   relay belongs to the dedicated `mnscloud-media` runtime.
 - Keep the WebRTC edge separate from the generic `mnscloud-nginx` HTTP edge.
