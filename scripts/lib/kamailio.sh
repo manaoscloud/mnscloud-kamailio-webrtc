@@ -15,7 +15,7 @@ render_kamailio_config() {
   done
   render_kamailio_rtpengine_socket
   render_kamailio_listeners
-  render_kamailio_pabx_routes
+  render_kamailio_sip_targets
 }
 
 validate_kamailio() {
@@ -52,7 +52,7 @@ render_kamailio_listeners() {
     elif [[ -n "$private_ip" ]]; then
       warn "Skipping private Kamailio SIP listener because $private_ip is not assigned to this host."
     else
-      warn "No private IPv4 found in WebRTC runtime config. PABX routing may fail for non-loopback SIP targets."
+      warn "No private IPv4 found in WebRTC runtime config. SIP target routing may fail for non-loopback destinations."
     fi
   } > "$output_tmp"
 
@@ -105,10 +105,10 @@ render_kamailio_rtpengine_socket() {
   ok "Kamailio rtpengine socket: ${socket}"
 }
 
-render_kamailio_pabx_routes() {
+render_kamailio_sip_targets() {
   local config_file="$CONFIG_DIR/config.json"
   local output_tmp
-  local output_file="$KAMAILIO_MNS_DIR/mnscloud-pabx-routes.cfg"
+  local output_file="$KAMAILIO_MNS_DIR/mnscloud-sip-targets.cfg"
   output_tmp="$(mktemp)"
 
   {
@@ -118,31 +118,36 @@ render_kamailio_pabx_routes() {
     printf '    xlog("L_INFO", "MNSCloud WebRTC route request method=$rm ruri=$ru from=$fu source=$si\\\\n");\n\n'
 
     if [[ -s "$config_file" ]]; then
-      jq -r '(.pabxTargets // .data.pabxTargets // []) | .[] | @base64' "$config_file" | while IFS= read -r encoded; do
-        local domain host port transport target_host target_uri
+      jq -r '(.sipTargets // .data.sipTargets // []) | .[] | @base64' "$config_file" | while IFS= read -r encoded; do
+        local domain host port transport target_type target_host target_uri
         domain="$(printf '%s' "$encoded" | base64 -d | jq -r '.domain // empty' | tr '[:upper:]' '[:lower:]')"
         host="$(printf '%s' "$encoded" | base64 -d | jq -r '.host // empty')"
         port="$(printf '%s' "$encoded" | base64 -d | jq -r '.port // 5060')"
         transport="$(printf '%s' "$encoded" | base64 -d | jq -r '.transport // "udp"' | tr '[:upper:]' '[:lower:]')"
+        target_type="$(printf '%s' "$encoded" | base64 -d | jq -r '.targetType // empty' | tr '[:upper:]' '[:lower:]')"
 
         if [[ ! "$domain" =~ ^[a-z0-9][a-z0-9.-]*[a-z0-9]$ ]]; then
-          warn "Skipping invalid PABX route domain from runtime config: $domain"
+          warn "Skipping invalid WebRTC SIP target domain from runtime config: $domain"
           continue
         fi
         if [[ ! "$host" =~ ^[A-Za-z0-9._:-]+$ ]]; then
-          warn "Skipping invalid PABX route host for $domain"
+          warn "Skipping invalid WebRTC SIP target host for $domain"
           continue
         fi
         if [[ "$host" == "127.0.0.1" || "$host" == "::1" || "$host" == "localhost" ]]; then
-          warn "Skipping local-loop PABX route host for $domain"
+          warn "Skipping local-loop WebRTC SIP target host for $domain"
+          continue
+        fi
+        if [[ ! "$target_type" =~ ^(pabx|softswitch)$ ]]; then
+          warn "Skipping invalid WebRTC SIP target type for $domain"
           continue
         fi
         if [[ ! "$port" =~ ^[0-9]+$ || "$port" -lt 1 || "$port" -gt 65535 ]]; then
-          warn "Skipping invalid PABX route port for $domain"
+          warn "Skipping invalid WebRTC SIP target port for $domain"
           continue
         fi
         if [[ ! "$transport" =~ ^(udp|tcp|tls)$ ]]; then
-          warn "Skipping invalid PABX route transport for $domain"
+          warn "Skipping invalid WebRTC SIP target transport for $domain"
           continue
         fi
 
@@ -154,7 +159,7 @@ render_kamailio_pabx_routes() {
 
         printf '    if ($rd == "%s") {\n' "$domain"
         printf '        $du = "%s";\n' "$target_uri"
-        printf '        xlog("L_INFO", "MNSCloud WebRTC routing domain=%s target=%s\\\\n");\n' "$domain" "$target_uri"
+        printf '        xlog("L_INFO", "MNSCloud WebRTC routing domain=%s type=%s target=%s\\\\n");\n' "$domain" "$target_type" "$target_uri"
         printf '        if (!is_method("REGISTER")) {\n'
         printf '            record_route();\n'
         printf '        }\n'
@@ -166,11 +171,12 @@ render_kamailio_pabx_routes() {
       done
     fi
 
-    printf '    sl_send_reply("404", "No PABX target");\n'
+    printf '    sl_send_reply("404", "No realtime SIP target");\n'
     printf '    exit;\n'
     printf '}\n'
   } > "$output_tmp"
 
   install -m 0644 "$output_tmp" "$output_file"
+  rm -f "$KAMAILIO_MNS_DIR/mnscloud-pabx-routes.cfg"
   rm -f "$output_tmp"
 }

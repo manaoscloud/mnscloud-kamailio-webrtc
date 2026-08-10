@@ -1,6 +1,6 @@
-# Generated PABX routes are rendered by scripts/lib/kamailio.sh at:
-# /etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg
+# Generated SIP targets are rendered by scripts/lib/kamailio.sh at:
+# /etc/kamailio/mnscloud/mnscloud-sip-targets.cfg
 #
 # Routing resolves the canonical identity:
-# extension@domain -> tenant -> PABX target.
-include_file "/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg"
+# extension@domain -> WebRTC domain -> PABX or Softswitch target.
+include_file "/etc/kamailio/mnscloud/mnscloud-sip-targets.cfg"

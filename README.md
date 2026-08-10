@@ -77,7 +77,7 @@ stay in this module, and RTP/SRTP media relay stays in `mnscloud-media`.
 - Nginx config: `/etc/nginx/conf.d/mnscloud-webrtc.conf`
 - Kamailio config: `/etc/kamailio/kamailio.cfg`
 - Generated Kamailio listeners: `/etc/kamailio/mnscloud/mnscloud-listen.cfg`
-- Generated PABX routes: `/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg`
+- Generated SIP targets: `/etc/kamailio/mnscloud/mnscloud-sip-targets.cfg`
 - Generated rtpengine socket include: `/etc/kamailio/mnscloud/mnscloud-rtpengine.cfg`
 - Edge config endpoint: `/api/v1/realtime/webrtc/edge/config`
 - Public WSS port: `443/tcp`
@@ -170,23 +170,24 @@ sudo ./scripts/update-latest-kamailio-webrtc.sh
 sudo bash /opt/mnscloud/kamailio-webrtc/scripts/validate-kamailio-webrtc.sh
 ```
 
-## PABX Routing
+## SIP Target Routing
 
 The edge does not route SIP traffic by extension username alone. The control
-plane sends a domain-based `pabxTargets` list in the runtime config response,
+plane sends a domain-based `sipTargets` list in the runtime config response,
 and the sync command renders Kamailio routes in:
 
 ```text
-/etc/kamailio/mnscloud/mnscloud-pabx-routes.cfg
+/etc/kamailio/mnscloud/mnscloud-sip-targets.cfg
 ```
 
-Each route maps the request domain to one internal PABX SIP target:
+Each route maps the request domain to one internal PABX or Softswitch SIP
+target:
 
 ```text
 extension@pbx.example.com -> sip:10.0.0.20:5060;transport=udp
 ```
 
-If no target exists for a domain, Kamailio returns `404 No PABX target`. This is
+If no target exists for a domain, Kamailio returns `404 No realtime SIP target`. This is
 intentional: the edge must fail closed instead of relaying traffic to a stale or
 looping destination.
 
