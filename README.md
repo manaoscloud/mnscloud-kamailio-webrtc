@@ -194,7 +194,9 @@ looping destination.
 Calls returned from an internal PABX or Softswitch through a REGISTER `Path` are handled
 before the domain target lookup. Browser contacts use `.invalid` hostnames, so the edge
 adds a contact alias during WebSocket REGISTER and resolves that alias on the return INVITE
-before relaying to the active WSS connection.
+before relaying to the active WSS connection. The return route accepts both normal
+`loose_route()` matches and explicit R-URIs containing `;alias=`, because some internal
+SIP runtimes preserve the Path route but leave the browser alias in the Request-URI.
 
 ## Public Ports
 
