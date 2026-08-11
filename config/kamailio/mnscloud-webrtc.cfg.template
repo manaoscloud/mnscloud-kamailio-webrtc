@@ -23,6 +23,7 @@ route[MNSCLOUD_WEBSOCKET] {
     if (proto == WS || proto == WSS) {
         force_rport();
         if (is_method("REGISTER")) {
+            add_contact_alias();
             add_path();
         }
     }

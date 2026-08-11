@@ -191,6 +191,11 @@ If no target exists for a domain, Kamailio returns `404 No realtime SIP target`.
 intentional: the edge must fail closed instead of relaying traffic to a stale or
 looping destination.
 
+Calls returned from an internal PABX or Softswitch through a REGISTER `Path` are handled
+before the domain target lookup. Browser contacts use `.invalid` hostnames, so the edge
+adds a contact alias during WebSocket REGISTER and resolves that alias on the return INVITE
+before relaying to the active WSS connection.
+
 ## Public Ports
 
 Recommended public exposure:

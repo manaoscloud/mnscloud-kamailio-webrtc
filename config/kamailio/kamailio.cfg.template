@@ -20,6 +20,7 @@ include_file "/etc/kamailio/mnscloud/mnscloud-core.cfg"
 include_file "/etc/kamailio/mnscloud/mnscloud-webrtc.cfg"
 include_file "/etc/kamailio/mnscloud/mnscloud-rtpengine.cfg"
 include_file "/etc/kamailio/mnscloud/mnscloud-auth.cfg"
+include_file "/etc/kamailio/mnscloud/mnscloud-path-relay.cfg"
 include_file "/etc/kamailio/mnscloud/mnscloud-routing.cfg"
 
 request_route {
@@ -33,6 +34,7 @@ request_route {
         exit;
     }
 
+    route(MNSCLOUD_PATH_RELAY);
     route(MNSCLOUD_WEBSOCKET);
     route(MNSCLOUD_AUTH);
     route(MNSCLOUD_RTPENGINE_OFFER);
