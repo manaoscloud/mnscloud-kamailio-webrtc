@@ -11,6 +11,10 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 require_root
 install -d -m 0700 "$CONFIG_DIR" "$STATE_DIR"
 
+if [[ "$(realpath -m "$REPO_DIR")" != "$(realpath -m "$INSTALL_DIR")" ]]; then
+  install_payload "$REPO_DIR"
+fi
+
 CONFIG_TMP="$(mktemp)"
 trap 'rm -f "$CONFIG_TMP"' EXIT
 
