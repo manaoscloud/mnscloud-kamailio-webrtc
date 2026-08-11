@@ -119,8 +119,9 @@ render_kamailio_sip_targets() {
 
     if [[ -s "$config_file" ]]; then
       jq -r '(.sipTargets // .data.sipTargets // []) | .[] | @base64' "$config_file" | while IFS= read -r encoded; do
-        local domain host port transport target_type target_host target_uri
+        local domain sip_domain host port transport target_type target_host target_uri route_condition
         domain="$(printf '%s' "$encoded" | base64 -d | jq -r '.domain // empty' | tr '[:upper:]' '[:lower:]')"
+        sip_domain="$(printf '%s' "$encoded" | base64 -d | jq -r '.sipDomain // empty' | tr '[:upper:]' '[:lower:]')"
         host="$(printf '%s' "$encoded" | base64 -d | jq -r '.host // empty')"
         port="$(printf '%s' "$encoded" | base64 -d | jq -r '.port // 5060')"
         transport="$(printf '%s' "$encoded" | base64 -d | jq -r '.transport // "udp"' | tr '[:upper:]' '[:lower:]')"
@@ -129,6 +130,10 @@ render_kamailio_sip_targets() {
         if [[ ! "$domain" =~ ^[a-z0-9][a-z0-9.-]*[a-z0-9]$ ]]; then
           warn "Skipping invalid WebRTC SIP target domain from runtime config: $domain"
           continue
+        fi
+        if [[ -n "$sip_domain" && ! "$sip_domain" =~ ^[a-z0-9][a-z0-9.-]*[a-z0-9]$ ]]; then
+          warn "Ignoring invalid WebRTC SIP target SIP domain from runtime config: $sip_domain"
+          sip_domain=""
         fi
         if [[ ! "$host" =~ ^[A-Za-z0-9._:-]+$ ]]; then
           warn "Skipping invalid WebRTC SIP target host for $domain"
@@ -156,10 +161,14 @@ render_kamailio_sip_targets() {
           target_host="[$target_host]"
         fi
         target_uri="sip:${target_host}:${port};transport=${transport}"
+        route_condition="\$rd == \"${domain}\""
+        if [[ -n "$sip_domain" && "$sip_domain" != "$domain" ]]; then
+          route_condition="${route_condition} || \$rd == \"${sip_domain}\""
+        fi
 
-        printf '    if ($rd == "%s") {\n' "$domain"
+        printf '    if (%s) {\n' "$route_condition"
         printf '        $du = "%s";\n' "$target_uri"
-        printf '        xlog("L_INFO", "MNSCloud WebRTC routing domain=%s type=%s target=%s\\\\n");\n' "$domain" "$target_type" "$target_uri"
+        printf '        xlog("L_INFO", "MNSCloud WebRTC routing domain=$rd web_domain=%s sip_domain=%s type=%s target=%s\\\\n");\n' "$domain" "${sip_domain:-$domain}" "$target_type" "$target_uri"
         printf '        if (!is_method("REGISTER")) {\n'
         printf '            record_route();\n'
         printf '        }\n'
