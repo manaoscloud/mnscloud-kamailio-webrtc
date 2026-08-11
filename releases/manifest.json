@@ -3,9 +3,9 @@
   "repository": "manaoscloud/mnscloud-kamailio-webrtc",
   "channels": {
     "stable": {
-      "version": "0.1.7",
-      "ref": "v0.1.7",
-      "releasedAt": "2026-08-10T15:07:24Z",
+      "version": "0.1.8",
+      "ref": "v0.1.8",
+      "releasedAt": "2026-08-11T01:27:38Z",
       "minimumVersion": "0.1.0"
     }
   }
