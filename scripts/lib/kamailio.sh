@@ -199,6 +199,14 @@ render_kamailio_path_relay() {
 route[MNSCLOUD_PATH_RELAY] {
     if (loose_route()) {
         xlog("L_INFO", "MNSCloud WebRTC Path relay method=$rm ruri=$ru route=$hdr(Route) source=$si\n");
+        if (is_method("INVITE") && has_body("application/sdp")) {
+            xlog("L_INFO", "MNSCloud WebRTC Path media offer callid=$ci source=$si ruri=$ru\n");
+            if (!rtpengine_offer("replace-origin replace-session-connection RTP/SAVPF ICE=force DTLS=passive rtcp-mux-offer")) {
+                xlog("L_ERR", "MNSCloud WebRTC Path media offer failed callid=$ci source=$si ruri=$ru\n");
+                sl_send_reply("488", "WebRTC media negotiation failed");
+                exit;
+            }
+        }
         if (!handle_ruri_alias()) {
             sl_send_reply("404", "No WebRTC contact alias");
             exit;
@@ -211,6 +219,14 @@ route[MNSCLOUD_PATH_RELAY] {
 
     if ($ru =~ ";alias=") {
         xlog("L_INFO", "MNSCloud WebRTC alias relay method=$rm ruri=$ru route=$hdr(Route) source=$si\n");
+        if (is_method("INVITE") && has_body("application/sdp")) {
+            xlog("L_INFO", "MNSCloud WebRTC alias media offer callid=$ci source=$si ruri=$ru\n");
+            if (!rtpengine_offer("replace-origin replace-session-connection RTP/SAVPF ICE=force DTLS=passive rtcp-mux-offer")) {
+                xlog("L_ERR", "MNSCloud WebRTC alias media offer failed callid=$ci source=$si ruri=$ru\n");
+                sl_send_reply("488", "WebRTC media negotiation failed");
+                exit;
+            }
+        }
         if (!handle_ruri_alias()) {
             sl_send_reply("404", "No WebRTC contact alias");
             exit;
