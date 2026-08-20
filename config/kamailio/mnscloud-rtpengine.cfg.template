@@ -13,7 +13,7 @@ route[MNSCLOUD_RTPENGINE_OFFER] {
             return;
         }
 
-        if (!rtpengine_offer("replace-origin replace-session-connection UDP/TLS/RTP/SAVPF ICE=force DTLS=passive SDES-off rtcp-mux-offer")) {
+        if (!rtpengine_offer("replace-origin replace-session-connection WebRTC")) {
             xlog("L_ERR", "MNSCloud WebRTC rtpengine_offer to WebRTC failed callid=$ci source=$si ruri=$ru\n");
             sl_send_reply("488", "WebRTC media negotiation failed");
             exit;
@@ -28,10 +28,10 @@ route[MNSCLOUD_RTPENGINE_ANSWER] {
                 xlog("L_ERR", "MNSCloud WebRTC rtpengine_answer to SIP failed callid=$ci source=$si\n");
                 drop;
             }
-            exit;
+            return;
         }
 
-        if (!rtpengine_answer("replace-origin replace-session-connection UDP/TLS/RTP/SAVPF ICE=force DTLS=passive SDES-off rtcp-mux-offer")) {
+        if (!rtpengine_answer("replace-origin replace-session-connection WebRTC")) {
             xlog("L_ERR", "MNSCloud WebRTC rtpengine_answer to WebRTC failed callid=$ci source=$si\n");
             drop;
         }
