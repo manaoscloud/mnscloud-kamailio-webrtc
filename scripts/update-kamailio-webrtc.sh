@@ -8,11 +8,53 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$REPO_DIR/scripts/lib/kamailio.sh"
 . "$REPO_DIR/scripts/lib/nginx.sh"
 
+usage() {
+  cat <<'TXT'
+Usage:
+  sudo ./scripts/update-kamailio-webrtc.sh [--ref <git-tag-or-commit>]
+
+Updates the local WebRTC edge runtime, syncs generated configuration from the
+API, and validates Nginx and Kamailio.
+TXT
+}
+
+REF=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --ref)
+      REF="${2:-}"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      die "unknown argument: $1"
+      ;;
+  esac
+done
+
 require_root
 install -d -m 0700 "$CONFIG_DIR" "$STATE_DIR"
 
+if [[ -n "$REF" ]]; then
+  if [[ ! -d "$REPO_DIR/.git" ]]; then
+    die "--ref can only be used from a git checkout. Run the installed payload without --ref."
+  fi
+  cd "$REPO_DIR"
+  git fetch --tags --prune origin
+  if ! git rev-parse --verify --quiet "${REF}^{commit}" >/dev/null; then
+    recent_refs="$(git tag --sort=-creatordate | head -10 | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
+    [[ -n "$recent_refs" ]] || recent_refs="none"
+    die "update ref not found: ${REF}. Recent tags: ${recent_refs}"
+  fi
+  git checkout --detach "$REF"
+fi
+
 if [[ "$(realpath -m "$REPO_DIR")" != "$(realpath -m "$INSTALL_DIR")" ]]; then
   install_payload "$REPO_DIR"
+  exec "$INSTALL_DIR/scripts/update-kamailio-webrtc.sh"
 fi
 
 CONFIG_TMP="$(mktemp)"
