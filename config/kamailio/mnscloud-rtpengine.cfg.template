@@ -4,8 +4,17 @@ modparam("rtpengine", "rtpengine_sock", "{{RTPENGINE_SOCKET}}")
 
 route[MNSCLOUD_RTPENGINE_OFFER] {
     if (has_body("application/sdp")) {
-        if (!rtpengine_offer("replace-origin replace-session-connection ICE=force DTLS=passive")) {
-            xlog("L_ERR", "MNSCloud WebRTC rtpengine_offer failed callid=$ci source=$si ruri=$ru\n");
+        if ($si == "127.0.0.1") {
+            if (!rtpengine_offer("replace-origin replace-session-connection RTP/AVP ICE=remove DTLS=off rtcp-mux-demux")) {
+                xlog("L_ERR", "MNSCloud WebRTC rtpengine_offer to SIP failed callid=$ci source=$si ruri=$ru\n");
+                sl_send_reply("488", "SIP media negotiation failed");
+                exit;
+            }
+            return;
+        }
+
+        if (!rtpengine_offer("replace-origin replace-session-connection UDP/TLS/RTP/SAVPF ICE=force DTLS=passive SDES-off rtcp-mux-offer")) {
+            xlog("L_ERR", "MNSCloud WebRTC rtpengine_offer to WebRTC failed callid=$ci source=$si ruri=$ru\n");
             sl_send_reply("488", "WebRTC media negotiation failed");
             exit;
         }
@@ -22,7 +31,7 @@ route[MNSCLOUD_RTPENGINE_ANSWER] {
             exit;
         }
 
-        if (!rtpengine_answer("replace-origin replace-session-connection ICE=force DTLS=passive")) {
+        if (!rtpengine_answer("replace-origin replace-session-connection UDP/TLS/RTP/SAVPF ICE=force DTLS=passive SDES-off rtcp-mux-offer")) {
             xlog("L_ERR", "MNSCloud WebRTC rtpengine_answer to WebRTC failed callid=$ci source=$si\n");
             drop;
         }
