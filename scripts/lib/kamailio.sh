@@ -78,6 +78,7 @@ detect_kamailio_private_ipv4() {
 
 render_kamailio_rtpengine_socket() {
   local config_file="$CONFIG_DIR/config.json"
+  local template_file="$REPO_DIR/config/kamailio/mnscloud-rtpengine.cfg.template"
   local output_file="$KAMAILIO_MNS_DIR/mnscloud-rtpengine.cfg"
   local socket
 
@@ -100,7 +101,7 @@ render_kamailio_rtpengine_socket() {
     socket="udp:127.0.0.1:2223"
   fi
 
-  sed "s#{{RTPENGINE_SOCKET}}#${socket}#g" "$output_file" > "${output_file}.tmp"
+  sed "s#{{RTPENGINE_SOCKET}}#${socket}#g" "$template_file" > "${output_file}.tmp"
   install -m 0644 "${output_file}.tmp" "$output_file"
   rm -f "${output_file}.tmp"
   ok "Kamailio rtpengine socket: ${socket}"
