@@ -94,6 +94,9 @@ install_payload() {
   install -m 0644 "$source_dir/README.md" "$INSTALL_DIR/README.md"
   install -m 0644 "$source_dir/SECURITY.md" "$INSTALL_DIR/SECURITY.md"
   install -m 0644 "$source_dir/SKILL.md" "$INSTALL_DIR/SKILL.md"
+  if [[ -f "$source_dir/VERSION" ]]; then
+    install -m 0644 "$source_dir/VERSION" "$INSTALL_DIR/VERSION"
+  fi
   chmod 0755 "$INSTALL_DIR/scripts/"*.sh
   ok "Runtime payload installed in $INSTALL_DIR"
 }
