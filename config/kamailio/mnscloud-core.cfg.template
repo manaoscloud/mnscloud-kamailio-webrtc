@@ -11,3 +11,5 @@ loadmodule "corex.so"
 loadmodule "ctl.so"
 loadmodule "jsonrpcs.so"
 loadmodule "htable.so"
+
+modparam("htable", "htable", "mnscloud_webrtc_sdp_reply=>size=8;autoexpire=300")

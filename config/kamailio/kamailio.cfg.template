@@ -34,6 +34,10 @@ request_route {
         exit;
     }
 
+    if (is_method("INVITE") && t_check_trans()) {
+        exit;
+    }
+
     route(MNSCLOUD_PATH_RELAY);
     route(MNSCLOUD_WEBSOCKET);
     route(MNSCLOUD_AUTH);
@@ -43,5 +47,13 @@ request_route {
 
 onreply_route {
     xlog("L_INFO", "MNSCloud WebRTC reply status=$rs reason=$rr source=$si to=$tu cseq=$cs ruri=$ru\n");
+    if (has_body("application/sdp")) {
+        $var(mnscloud_sdp_reply_key) = $ci + "::" + $cs + "::" + $rs;
+        if ($sht(mnscloud_webrtc_sdp_reply=>$var(mnscloud_sdp_reply_key)) != $null) {
+            xlog("L_INFO", "MNSCloud WebRTC duplicate SDP reply skipped for media rewrite key=$var(mnscloud_sdp_reply_key)\n");
+            return;
+        }
+        $sht(mnscloud_webrtc_sdp_reply=>$var(mnscloud_sdp_reply_key)) = 1;
+    }
     route(MNSCLOUD_RTPENGINE_ANSWER);
 }
