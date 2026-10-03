@@ -18,13 +18,24 @@ Installs the native MNSCloud Kamailio WebRTC edge runtime.
 TXT
 }
 
+# Keep the enrolled Agent name (MonitoringAgent.MagName); fall back to the FQDN only when the
+# local Agent has no name yet. Passing the FQDN unconditionally renames Agents enrolled with a
+# short name (for example mns-api-dev1 -> mns-api-dev1.<internal-domain>).
+mnscloud_agent_install_label() {
+  local name=""
+  name="$(awk '/^[[:space:]]*name[[:space:]]*=/ { sub(/^[^=]*=[[:space:]]*/, ""); sub(/[[:space:]]+$/, ""); print; exit }' \
+    /etc/mnscloud/agent/agent.conf 2>/dev/null || true)"
+  [[ -n "$name" ]] || name="$(hostname -f 2>/dev/null || hostname 2>/dev/null || printf 'mnscloud-agent')"
+  printf '%s\n' "$name"
+}
+
 refresh_agent_capabilities() {
   local api_base="$1"
   if [[ -x /opt/mnscloud/mnscloud-agent/scripts/install-agent.sh ]]; then
     info "Refreshing MNSCloud Agent capabilities after WebRTC runtime install."
     bash /opt/mnscloud/mnscloud-agent/scripts/install-agent.sh \
       --api-base "$api_base" \
-      --install-label "$(hostname -f 2>/dev/null || hostname)"
+      --install-label "$(mnscloud_agent_install_label)"
   else
     warn "MNSCloud Agent source repo not found at /opt/mnscloud/mnscloud-agent; reinstall or restart the Agent manually so it reports realtime.webrtc.manage."
   fi
