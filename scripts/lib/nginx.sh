@@ -147,7 +147,9 @@ ensure_nginx_domain_certificate() {
     && { [[ ! -s "$cert" || ! -s "$key" ]] || certificate_is_self_signed "$cert"; } \
     && command -v certbot >/dev/null 2>&1; then
     email="$(nginx_certbot_email)"
-    if [[ -n "$email" ]]; then
+    if [[ -n "$email" ]] && ! wait_for_dns_target "$domain" "$(declare -F runtime_detected_public_ips >/dev/null && runtime_detected_public_ips)"; then
+      warn "Skipping Let's Encrypt for $domain until its DNS points to this edge; using a temporary self-signed certificate."
+    elif [[ -n "$email" ]]; then
       install -d -m 0755 "$(nginx_acme_webroot)"
       if certbot certonly --webroot \
         -w "$(nginx_acme_webroot)" \
