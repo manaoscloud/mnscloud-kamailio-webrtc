@@ -100,3 +100,25 @@ install_payload() {
   chmod 0755 "$INSTALL_DIR/scripts/"*.sh
   ok "Runtime payload installed in $INSTALL_DIR"
 }
+
+# Waits until a public name resolves to one of this node's addresses before an ACME HTTP-01
+# challenge, so a not yet published (managed DNS) or wrong record never burns Let's Encrypt
+# attempts. MNSCLOUD_DNS_WAIT_SECONDS bounds the wait (default 300). Returns 1 on timeout.
+wait_for_dns_target() {
+  local domain="$1" expected="${2:-}" timeout="${MNSCLOUD_DNS_WAIT_SECONDS:-300}"
+  local interval=15 waited=0 resolved="" ip
+  while :; do
+    resolved="$(getent ahosts "$domain" 2>/dev/null | awk '{print tolower($1)}' | sort -u | tr '\n' ' ')"
+    if [[ -n "$resolved" ]]; then
+      [[ -z "$expected" ]] && return 0
+      for ip in ${expected//,/ }; do
+        [[ " $resolved " == *" ${ip,,} "* ]] && return 0
+      done
+    fi
+    ((waited >= timeout)) && break
+    sleep "$interval"
+    waited=$((waited + interval))
+  done
+  warn "DNS for ${domain} does not point to this node yet (resolved: ${resolved:-none}; expected: ${expected:-any})."
+  return 1
+}

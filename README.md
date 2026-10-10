@@ -149,7 +149,13 @@ One edge server can publish multiple partner or tenant WSS domains. Register
 those domains in MNSCloud as WebRTC domains for the selected server; the sync
 service renders SNI-based Nginx blocks and manages per-domain certificate paths.
 For automatic Let’s Encrypt issuance, make sure the domain DNS points to the
-edge and configure the WebRTC parameter `certbot_email`.
+edge and configure the WebRTC parameter `certbot_email`. The edge waits up to
+`MNSCLOUD_DNS_WAIT_SECONDS` (default `300`) for the domain to resolve to its
+own public address before requesting a certificate; until then it keeps a
+temporary self-signed certificate and the next sync retries. The public address
+reported to MNSCloud is detected on the host (egress IPv4, or
+`MNSCLOUD_WEBRTC_PUBLIC_IP`, plus the stable global IPv6), not resolved from the
+edge domain, so a managed Realtime DNS record can be published from it.
 
 After installation, configuration can be synchronized with:
 

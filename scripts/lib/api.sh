@@ -109,8 +109,31 @@ runtime_private_ip() {
     "$(runtime_default_route_source_ip 6 || true)"
 }
 
+# Public addresses of this host: egress IPv4 (MNSCLOUD_WEBRTC_PUBLIC_IP overrides) and the stable
+# global IPv6. Managed Realtime DNS publishes records from these, so they must not depend on DNS.
+runtime_detected_public_ips() {
+  local ipv4="${MNSCLOUD_WEBRTC_PUBLIC_IP:-}" ipv6
+  if [[ -z "$ipv4" ]]; then
+    ipv4="$(curl -4 -fsS --max-time 5 https://api.ipify.org 2>/dev/null ||
+      curl -4 -fsS --max-time 5 https://ifconfig.me/ip 2>/dev/null || true)"
+    ipv4="$(printf '%s' "$ipv4" | tr -d '[:space:]')"
+    [[ "$ipv4" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || ipv4=""
+  fi
+  ipv6="$(ip -o -6 addr show scope global 2>/dev/null |
+    grep -Ev ' (temporary|deprecated|tentative|dadfailed)( |$)' |
+    awk '{split($4,a,"/"); print tolower(a[1])}' |
+    grep -Ei '^[23][0-9a-f]{0,3}:' | head -n1 || true)"
+  runtime_join_values "$ipv4" "$ipv6"
+}
+
 runtime_public_ip() {
-  local public_domain="$1"
+  local public_domain="$1" detected
+  detected="$(runtime_detected_public_ips)"
+  if [[ -n "$detected" ]]; then
+    printf '%s\n' "$detected"
+    return 0
+  fi
+  # Fallback for hosts without outbound HTTP: the operator-maintained DNS name.
   runtime_join_values \
     "$(runtime_resolve_first_ip 4 "$public_domain" || true)" \
     "$(runtime_resolve_first_ip 6 "$public_domain" || true)"
