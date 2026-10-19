@@ -7,6 +7,7 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$REPO_DIR/scripts/lib/common.sh"
 . "$REPO_DIR/scripts/lib/kamailio.sh"
 . "$REPO_DIR/scripts/lib/nginx.sh"
+. "$REPO_DIR/scripts/lib/acme.sh"
 . "$REPO_DIR/scripts/lib/validation.sh"
 
 main() {

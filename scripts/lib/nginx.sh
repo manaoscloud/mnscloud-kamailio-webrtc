@@ -65,6 +65,16 @@ domain_certificate_status() {
     return 0
   fi
 
+  if [[ "$provider" == "wildcard" ]]; then
+    local base
+    if base="$(wildcard_base_for_domain "$domain")" && [[ -s "$(wildcard_live_dir "$base")/fullchain.pem" ]]; then
+      printf '%s\n' 'issued'
+    else
+      printf '%s\n' 'self_signed'
+    fi
+    return 0
+  fi
+
   if [[ ! -s "$cert" || ! -s "$key" ]]; then
     printf '%s\n' 'failed'
     return 0
@@ -141,6 +151,22 @@ ensure_nginx_domain_certificate() {
     ln -sf "$le_cert" "$cert"
     ln -sf "$le_key" "$key"
     return 0
+  fi
+
+  # Account WSS domains use the wildcard this edge holds for their base (no per-domain issuance).
+  if [[ "$provider" == "wildcard" ]]; then
+    local base live
+    if base="$(wildcard_base_for_domain "$domain")"; then
+      live="$(wildcard_live_dir "$base")"
+      if [[ -s "$live/fullchain.pem" && -s "$live/privkey.pem" ]]; then
+        ln -sf "$live/fullchain.pem" "$cert"
+        ln -sf "$live/privkey.pem" "$key"
+        return 0
+      fi
+    fi
+    # Until the wildcard exists, a previous link may point to nothing: replace it below.
+    [[ -L "$cert" && ! -s "$cert" ]] && rm -f "$cert" "$key"
+    warn "Wildcard certificate for $domain is not available yet; using a temporary self-signed certificate."
   fi
 
   if [[ "$provider" == "letsencrypt" ]] \

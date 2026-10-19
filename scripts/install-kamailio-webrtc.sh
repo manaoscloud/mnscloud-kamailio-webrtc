@@ -84,6 +84,7 @@ done
 . "$REPO_DIR/scripts/lib/api.sh"
 . "$REPO_DIR/scripts/lib/kamailio.sh"
 . "$REPO_DIR/scripts/lib/nginx.sh"
+. "$REPO_DIR/scripts/lib/acme.sh"
 . "$REPO_DIR/scripts/lib/systemd.sh"
 . "$REPO_DIR/scripts/lib/validation.sh"
 

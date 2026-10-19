@@ -11,6 +11,7 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$REPO_DIR/scripts/lib/kamailio.sh"
 # shellcheck source=scripts/lib/nginx.sh
 . "$REPO_DIR/scripts/lib/nginx.sh"
+. "$REPO_DIR/scripts/lib/acme.sh"
 # shellcheck source=scripts/lib/validation.sh
 . "$REPO_DIR/scripts/lib/validation.sh"
 
