@@ -101,9 +101,18 @@ emit_domain_certificate_status() {
   info "CERT_STATUS domain=$domain status=$status provider=$provider"
 }
 
+# Bound WebRTC domains plus the server primary domain (generated <uuid>.<base> or chosen), which
+# gets its own Let's Encrypt certificate like any bound domain.
 nginx_domain_list_json() {
   if [[ -s "$CONFIG_DIR/config.json" ]]; then
-    jq -c '[.data.domains[]? | select(.domain and .autoProvision != 0)]' "$CONFIG_DIR/config.json"
+    jq -c '
+      [.data.domains[]? | select(.domain and .autoProvision != 0)] as $bound
+      | ((.data.server.primaryDomain // "") | ascii_downcase) as $primary
+      | if ($primary | test("^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$"))
+          and ([$bound[] | .domain | ascii_downcase] | index($primary)) == null
+        then $bound + [{domain: $primary, certificateProvider: "letsencrypt", autoProvision: 1}]
+        else $bound end
+    ' "$CONFIG_DIR/config.json"
     return 0
   fi
   printf '[]\n'
