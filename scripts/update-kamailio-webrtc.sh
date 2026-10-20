@@ -134,6 +134,7 @@ fi
 refresh_systemd_units_if_changed
 request_wildcard_certificates
 render_nginx_config "$server_name"
+request_http01_certificates
 render_kamailio_config
 validate_nginx
 validate_kamailio

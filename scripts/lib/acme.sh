@@ -131,13 +131,12 @@ clear_wildcard_failures() {
 }
 
 # Fingerprints of the held wildcard certificates (detects an issuance or renewal).
-wildcard_certificates_signature() {
-  local base cert
-  while IFS= read -r base; do
-    [[ -n "$base" ]] || continue
-    cert="$(wildcard_live_dir "$base")/fullchain.pem"
+# Fingerprints of every Let's Encrypt certificate on this edge (wildcards and HTTP-01 domains).
+letsencrypt_certificates_signature() {
+  local cert
+  for cert in /etc/letsencrypt/live/*/fullchain.pem; do
     [[ -s "$cert" ]] && openssl x509 -in "$cert" -noout -fingerprint -sha256 2>/dev/null
-  done < <(wildcard_bases)
+  done
   return 0
 }
 

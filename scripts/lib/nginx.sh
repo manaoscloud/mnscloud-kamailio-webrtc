@@ -144,6 +144,31 @@ ensure_nginx_tls_certificate() {
   chmod 0644 "$cert"
 }
 
+# Certbot may be the snap package, which cannot run inside the sync unit sandbox (NoNewPrivileges,
+# ProtectHome). When mnscloud-webrtc-acme.service exists, HTTP-01 issuance runs there
+# (MNSCLOUD_CERTBOT_CONTEXT=unconfined); the sync only serves a temporary certificate and starts it.
+HTTP01_PENDING=0
+http01_issuance_deferred() {
+  [[ "${MNSCLOUD_CERTBOT_CONTEXT:-}" != "unconfined" && -f /etc/systemd/system/mnscloud-webrtc-acme.service ]]
+}
+
+http01_failure_marker() {
+  printf '%s/acme/http01.%s.failed\n' "$STATE_DIR" "$1"
+}
+
+http01_failed_recently() {
+  local last
+  last="$(cat "$(http01_failure_marker "$1")" 2>/dev/null || printf '0')"
+  (( $(date +%s) - last < ${MNSCLOUD_ACME_RETRY_SECONDS:-3600} ))
+}
+
+# Starts the unconfined certificate unit when a Let's Encrypt domain still waits for issuance.
+request_http01_certificates() {
+  [[ "$HTTP01_PENDING" == "1" ]] || return 0
+  systemctl start --no-block mnscloud-webrtc-acme.service ||
+    warn "Could not start mnscloud-webrtc-acme.service."
+}
+
 ensure_nginx_domain_certificate() {
   local domain="$1"
   local provider="${2:-letsencrypt}"
@@ -182,7 +207,12 @@ ensure_nginx_domain_certificate() {
     && { [[ ! -s "$cert" || ! -s "$key" ]] || certificate_is_self_signed "$cert"; } \
     && command -v certbot >/dev/null 2>&1; then
     email="$(nginx_certbot_email)"
-    if [[ -n "$email" ]] && ! wait_for_dns_target "$domain" "$(declare -F runtime_detected_public_ips >/dev/null && runtime_detected_public_ips)"; then
+    if http01_issuance_deferred; then
+      HTTP01_PENDING=1
+      info "Let's Encrypt for $domain runs in mnscloud-webrtc-acme.service; temporary self-signed certificate meanwhile."
+    elif http01_failed_recently "$domain"; then
+      warn "Let's Encrypt for $domain failed recently; next attempt within the hour (shared rate limits)."
+    elif [[ -n "$email" ]] && ! wait_for_dns_target "$domain" "$(declare -F runtime_detected_public_ips >/dev/null && runtime_detected_public_ips)"; then
       warn "Skipping Let's Encrypt for $domain until its DNS points to this edge; using a temporary self-signed certificate."
     elif [[ -n "$email" ]]; then
       install -d -m 0755 "$(nginx_acme_webroot)"
@@ -193,10 +223,13 @@ ensure_nginx_domain_certificate() {
         --agree-tos \
         --email "$email" \
         --keep-until-expiring; then
+        rm -f "$(http01_failure_marker "$domain")"
         ln -sf "$le_cert" "$cert"
         ln -sf "$le_key" "$key"
         return 0
       fi
+      install -d -m 0700 "$STATE_DIR/acme"
+      date +%s > "$(http01_failure_marker "$domain")"
       warn "Let's Encrypt issuance failed for $domain. Falling back to a temporary self-signed certificate."
     else
       warn "Parameter certbot_email is missing. Falling back to a temporary self-signed certificate for $domain."
