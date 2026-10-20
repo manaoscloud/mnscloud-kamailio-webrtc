@@ -40,6 +40,11 @@ done
 require_root
 install -d -m 0700 "$CONFIG_DIR" "$STATE_DIR"
 
+# SHA-256 of stdin, digest only.
+sha256_digest() {
+  sha256sum | awk '{ print $1 }'
+}
+
 runtime_config_hash() {
   local target
   for target in \
@@ -54,12 +59,12 @@ runtime_config_hash() {
         sort -z |
         xargs -0 sha256sum 2>/dev/null || true
     fi
-  done | sha256sum | awk '{ print $1 }'
+  done | sha256_digest
 }
 
 runtime_nginx_hash() {
   if [[ -f /etc/nginx/conf.d/mnscloud-webrtc.conf ]]; then
-    sha256sum /etc/nginx/conf.d/mnscloud-webrtc.conf | awk '{ print $1 }'
+    sha256_digest < /etc/nginx/conf.d/mnscloud-webrtc.conf
     return 0
   fi
   printf '%s\n' 'missing'
@@ -76,12 +81,12 @@ runtime_kamailio_hash() {
         sort -z |
         xargs -0 sha256sum 2>/dev/null || true
     fi
-  done | sha256sum | awk '{ print $1 }'
+  done | sha256_digest
 }
 
 runtime_sip_targets_hash() {
   # The table does not exist before the first render: hash empty input instead of failing (pipefail).
-  { cat "$KAMAILIO_MNS_DIR/db/"* 2>/dev/null || true; } | sha256sum | awk '{ print $1 }'
+  { cat "$KAMAILIO_MNS_DIR/db/"* 2>/dev/null || true; } | sha256_digest
 }
 
 if [[ -n "$REF" ]]; then
