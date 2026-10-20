@@ -1,6 +1,30 @@
-# Generated SIP targets are rendered by scripts/lib/kamailio.sh at:
-# /etc/kamailio/mnscloud/mnscloud-sip-targets.cfg
-#
 # Routing resolves the canonical identity:
 # extension@domain -> WebRTC domain -> PABX or Softswitch target.
-include_file "/etc/kamailio/mnscloud/mnscloud-sip-targets.cfg"
+# Targets live in the htable mnscloud_sip_targets (key: WebRTC or SIP domain, lowercase; value: SIP
+# URI), loaded from /etc/kamailio/mnscloud/db and reloaded live by the sync.
+route[MNSCLOUD_ROUTE] {
+    xlog("L_INFO", "MNSCloud WebRTC route request method=$rm ruri=$ru rd=$rd from=$fu fd=$fd to=$tu td=$td source=$si\n");
+
+    $var(mns_target_domain) = "";
+    if ($rd != $null && $sht(mnscloud_sip_targets=>$(rd{s.tolower})) != $null) {
+        $var(mns_target_domain) = $(rd{s.tolower});
+    } else if ($fd != $null && $sht(mnscloud_sip_targets=>$(fd{s.tolower})) != $null) {
+        $var(mns_target_domain) = $(fd{s.tolower});
+    } else if ($td != $null && $sht(mnscloud_sip_targets=>$(td{s.tolower})) != $null) {
+        $var(mns_target_domain) = $(td{s.tolower});
+    }
+    if ($var(mns_target_domain) == "") {
+        sl_send_reply("404", "No realtime SIP target");
+        exit;
+    }
+
+    $du = $sht(mnscloud_sip_targets=>$var(mns_target_domain));
+    xlog("L_INFO", "MNSCloud WebRTC routing rd=$rd fd=$fd td=$td domain=$var(mns_target_domain) target=$du\n");
+    if (!is_method("REGISTER")) {
+        record_route();
+    }
+    if (!t_relay()) {
+        sl_reply_error();
+    }
+    exit;
+}

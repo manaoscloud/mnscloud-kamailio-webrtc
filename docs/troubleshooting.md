@@ -57,6 +57,7 @@ Common issues:
     API/control-plane driven and must not require local database authentication.
 - rtpengine service errors are owned by the dedicated `mnscloud-media` host.
   Validate that runtime with `sudo bash /opt/mnscloud/media/scripts/validate-media.sh`.
-- The sync service restarts Kamailio after rendering `/etc/kamailio/kamailio.cfg`.
-  Kamailio native configuration file changes require restart; module data
-  reloads via RPC are separate, module-specific operations.
+- The sync service restarts Kamailio only when its configuration code changes
+  (`/etc/kamailio/kamailio.cfg`, `/etc/kamailio/mnscloud/*.cfg`). SIP target changes
+  reload the htable live: inspect with `sudo kamcmd htable.dump mnscloud_sip_targets`
+  and force with `sudo kamcmd htable.reload mnscloud_sip_targets`.

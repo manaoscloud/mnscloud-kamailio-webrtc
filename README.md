@@ -77,7 +77,7 @@ stay in this module, and RTP/SRTP media relay stays in `mnscloud-media`.
 - Nginx config: `/etc/nginx/conf.d/mnscloud-webrtc.conf`
 - Kamailio config: `/etc/kamailio/kamailio.cfg`
 - Generated Kamailio listeners: `/etc/kamailio/mnscloud/mnscloud-listen.cfg`
-- Generated SIP targets: `/etc/kamailio/mnscloud/mnscloud-sip-targets.cfg`
+- Generated SIP targets (htable `mnscloud_sip_targets`, db_text): `/etc/kamailio/mnscloud/db/mnscloud_sip_targets`
 - Generated rtpengine socket include: `/etc/kamailio/mnscloud/mnscloud-rtpengine.cfg`
 - Edge config endpoint: `/api/v1/realtime/webrtc/edge/config`
 - Public WSS port: `443/tcp`
@@ -180,14 +180,19 @@ sudo bash /opt/mnscloud/kamailio-webrtc/scripts/validate-kamailio-webrtc.sh
 
 The edge does not route SIP traffic by extension username alone. The control
 plane sends a domain-based `sipTargets` list in the runtime config response,
-and the sync command renders Kamailio routes in:
+and the sync command writes them as data (db_text table loaded into the htable
+`mnscloud_sip_targets`) in:
 
 ```text
-/etc/kamailio/mnscloud/mnscloud-sip-targets.cfg
+/etc/kamailio/mnscloud/db/mnscloud_sip_targets
 ```
 
-Each route maps the request domain to one internal PABX or Softswitch SIP
-target:
+The fixed route `MNSCLOUD_ROUTE` looks up the request, From and To domains
+(lowercase, in that order). When only the targets change, the sync runs
+`kamcmd htable.reload mnscloud_sip_targets` (atomic swap) instead of restarting
+Kamailio, so new PABX/Softswitch accounts never drop open WSS sessions; it falls back
+to a restart only if the reload fails. Each entry maps a WebRTC (or SIP) domain to one
+internal PABX or Softswitch SIP target:
 
 ```text
 extension@pbx.example.com -> sip:10.0.0.20:5060;transport=udp

@@ -10,6 +10,14 @@ loadmodule "kex.so"
 loadmodule "corex.so"
 loadmodule "ctl.so"
 loadmodule "jsonrpcs.so"
+loadmodule "db_text.so"
 loadmodule "htable.so"
 
 modparam("htable", "htable", "mnscloud_webrtc_sdp_reply=>size=8;autoexpire=300")
+# SIP targets (WebRTC domain -> PABX/Softswitch SIP URI) are data, not routing code: the sync writes
+# /etc/kamailio/mnscloud/db/mnscloud_sip_targets and reloads the table with
+# `kamcmd htable.reload mnscloud_sip_targets`, so a new account never restarts Kamailio.
+# db_text without cache: htable reads it only at startup and on htable.reload.
+modparam("db_text", "db_mode", 1)
+modparam("htable", "db_url", "text:///etc/kamailio/mnscloud/db")
+modparam("htable", "htable", "mnscloud_sip_targets=>size=10;dbtable=mnscloud_sip_targets;")
