@@ -71,11 +71,16 @@ runtime_kamailio_hash() {
     if [[ -f "$target" ]]; then
       sha256sum "$target"
     elif [[ -d "$target" ]]; then
-      find "$target" -type f -print0 2>/dev/null |
+      # The SIP targets table is data reloaded live; it does not count as Kamailio code.
+      find "$target" -path "$KAMAILIO_MNS_DIR/db" -prune -o -type f -print0 2>/dev/null |
         sort -z |
         xargs -0 sha256sum 2>/dev/null || true
     fi
   done | sha256sum | awk '{ print $1 }'
+}
+
+runtime_sip_targets_hash() {
+  cat "$KAMAILIO_MNS_DIR/db/"* 2>/dev/null | sha256sum | awk '{ print $1 }'
 }
 
 if [[ -n "$REF" ]]; then
@@ -102,6 +107,7 @@ fi
 CONFIG_BEFORE_HASH="$(runtime_config_hash)"
 NGINX_BEFORE_HASH="$(runtime_nginx_hash)"
 KAMAILIO_BEFORE_HASH="$(runtime_kamailio_hash)"
+SIP_TARGETS_BEFORE_HASH="$(runtime_sip_targets_hash)"
 FORCE_SERVICE_RESTART="false"
 if [[ -n "$REF" ]]; then
   FORCE_SERVICE_RESTART="true"
@@ -128,6 +134,7 @@ validate_kamailio
 CONFIG_AFTER_HASH="$(runtime_config_hash)"
 NGINX_AFTER_HASH="$(runtime_nginx_hash)"
 KAMAILIO_AFTER_HASH="$(runtime_kamailio_hash)"
+SIP_TARGETS_AFTER_HASH="$(runtime_sip_targets_hash)"
 
 if [[ "$NGINX_BEFORE_HASH" != "$NGINX_AFTER_HASH" || "$FORCE_SERVICE_RESTART" == "true" ]]; then
   run systemctl reload nginx
@@ -137,6 +144,13 @@ fi
 
 if [[ "$KAMAILIO_BEFORE_HASH" != "$KAMAILIO_AFTER_HASH" || "$FORCE_SERVICE_RESTART" == "true" ]]; then
   run systemctl restart kamailio
+elif [[ "$SIP_TARGETS_BEFORE_HASH" != "$SIP_TARGETS_AFTER_HASH" ]]; then
+  if reload_kamailio_sip_targets; then
+    ok "Kamailio SIP targets reloaded live; active SIP/WebSocket dialogs preserved."
+  else
+    warn "Kamailio SIP targets reload failed; restarting Kamailio to apply them."
+    run systemctl restart kamailio
+  fi
 else
   ok "Kamailio WebRTC configuration unchanged; restart skipped to preserve active SIP/WebSocket dialogs."
 fi
