@@ -109,6 +109,7 @@ main() {
   REPO_DIR="$INSTALL_DIR"
 
   install_base_packages
+  prepare_letsencrypt_dirs
   install_kamailio
 
   render_nginx_config "$server_name"
