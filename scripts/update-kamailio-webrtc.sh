@@ -80,7 +80,8 @@ runtime_kamailio_hash() {
 }
 
 runtime_sip_targets_hash() {
-  cat "$KAMAILIO_MNS_DIR/db/"* 2>/dev/null | sha256sum | awk '{ print $1 }'
+  # The table does not exist before the first render: hash empty input instead of failing (pipefail).
+  { cat "$KAMAILIO_MNS_DIR/db/"* 2>/dev/null || true; } | sha256sum | awk '{ print $1 }'
 }
 
 if [[ -n "$REF" ]]; then
