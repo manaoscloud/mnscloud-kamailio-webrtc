@@ -120,7 +120,7 @@ fi
 
 # The sync unit gained write access to the Let's Encrypt state; refresh it when it changed.
 refresh_systemd_units_if_changed
-ensure_wildcard_certificates
+request_wildcard_certificates
 render_nginx_config "$server_name"
 render_kamailio_config
 validate_nginx

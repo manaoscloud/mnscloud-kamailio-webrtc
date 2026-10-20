@@ -1,0 +1,16 @@
+[Unit]
+Description=MNSCloud WebRTC Edge wildcard certificates (Let's Encrypt DNS-01)
+After=network-online.target
+Wants=network-online.target
+
+# Started by the sync unit (systemctl start --no-block) when the edge must hold a wildcard. Certbot
+# may be the snap package, which cannot run under NoNewPrivileges or ProtectHome (snap-confine is
+# setuid and needs /root/snap), so this unit does not inherit the sync unit's sandbox. It only runs
+# scripts/issue-wildcard-certificates.sh; DNS provider credentials never reach the edge.
+[Service]
+Type=oneshot
+ExecStart=/opt/mnscloud/kamailio-webrtc/scripts/issue-wildcard-certificates.sh
+User=root
+Group=root
+PrivateTmp=true
+TimeoutStartSec=20min

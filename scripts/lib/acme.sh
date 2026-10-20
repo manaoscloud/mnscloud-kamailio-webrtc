@@ -130,6 +130,29 @@ clear_wildcard_failures() {
   rm -f "$STATE_DIR"/acme/wildcard.*.failed 2>/dev/null || true
 }
 
+# Fingerprints of the held wildcard certificates (detects an issuance or renewal).
+wildcard_certificates_signature() {
+  local base cert
+  while IFS= read -r base; do
+    [[ -n "$base" ]] || continue
+    cert="$(wildcard_live_dir "$base")/fullchain.pem"
+    [[ -s "$cert" ]] && openssl x509 -in "$cert" -noout -fingerprint -sha256 2>/dev/null
+  done < <(wildcard_bases)
+  return 0
+}
+
+# Called by the sync: issuance runs in mnscloud-webrtc-acme.service, outside the sync sandbox
+# (snap Certbot cannot run under NoNewPrivileges/ProtectHome). Without that unit, run it here.
+request_wildcard_certificates() {
+  [[ -n "$(wildcard_bases)" ]] || return 0
+  if [[ -f /etc/systemd/system/mnscloud-webrtc-acme.service ]]; then
+    systemctl start --no-block mnscloud-webrtc-acme.service ||
+      warn "Could not start mnscloud-webrtc-acme.service."
+    return 0
+  fi
+  ensure_wildcard_certificates
+}
+
 ensure_wildcard_certificates() {
   local base
   while IFS= read -r base; do
