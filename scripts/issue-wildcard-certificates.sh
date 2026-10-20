@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Keeps the *.<base> certificates listed in the edge config (wildcardCertificates) and, when one was
-# issued or renewed, re-renders Nginx so the account domains serve it. Run by
-# mnscloud-webrtc-acme.service (outside the sync unit sandbox) or directly by an unconfined update.
+# Issues the edge's Let's Encrypt certificates outside the sync unit sandbox: the *.<base> wildcards
+# listed in the edge config (DNS-01) and the HTTP-01 certificates of the bound and primary domains.
+# When any certificate was issued or renewed, re-renders Nginx and reloads it. Run by
+# mnscloud-webrtc-acme.service or directly by an unconfined update.
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$REPO_DIR/scripts/lib/common.sh"
@@ -11,13 +12,15 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$REPO_DIR/scripts/lib/nginx.sh"
 . "$REPO_DIR/scripts/lib/acme.sh"
 
-before="$(wildcard_certificates_signature)"
+export MNSCLOUD_CERTBOT_CONTEXT=unconfined
+before="$(letsencrypt_certificates_signature)"
 ensure_wildcard_certificates
-if [[ "$(wildcard_certificates_signature)" != "$before" ]]; then
-  server_name="_"
-  [[ -s "$CONFIG_DIR/public.domain" ]] && server_name="$(tr -d '\r\n' < "$CONFIG_DIR/public.domain")"
-  render_nginx_config "$server_name"
+server_name="_"
+[[ -s "$CONFIG_DIR/public.domain" ]] && server_name="$(tr -d '\r\n' < "$CONFIG_DIR/public.domain")"
+# Rendering issues the HTTP-01 certificates still missing (certbot runs here, not in the sync).
+render_nginx_config "$server_name"
+if [[ "$(letsencrypt_certificates_signature)" != "$before" ]]; then
   validate_nginx
   run systemctl reload nginx
-  ok "Account WSS domains now use the wildcard certificate."
+  ok "Edge domains now use their Let's Encrypt certificates."
 fi
