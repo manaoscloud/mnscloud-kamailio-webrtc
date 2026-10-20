@@ -6,6 +6,8 @@ install_systemd_units() {
     /etc/systemd/system/mnscloud-webrtc-sync.service
   install -m 0644 "$REPO_DIR/config/systemd/mnscloud-webrtc-sync.timer.template" \
     /etc/systemd/system/mnscloud-webrtc-sync.timer
+  install -m 0644 "$REPO_DIR/config/systemd/mnscloud-webrtc-acme.service.template" \
+    /etc/systemd/system/mnscloud-webrtc-acme.service
   systemctl daemon-reload
   systemctl enable --now mnscloud-webrtc-sync.timer
 }
@@ -14,10 +16,10 @@ install_systemd_units() {
 # /etc read-only): only an unconfined run can refresh the units, which it does when they changed.
 refresh_systemd_units_if_changed() {
   local unit target
-  for unit in mnscloud-webrtc-sync.service mnscloud-webrtc-sync.timer; do
+  [[ -f /etc/systemd/system/mnscloud-webrtc-sync.service ]] || return 0
+  for unit in mnscloud-webrtc-sync.service mnscloud-webrtc-sync.timer mnscloud-webrtc-acme.service; do
     target="/etc/systemd/system/$unit"
-    [[ -f "$target" ]] || return 0
-    cmp -s "$REPO_DIR/config/systemd/$unit.template" "$target" && continue
+    [[ -f "$target" ]] && cmp -s "$REPO_DIR/config/systemd/$unit.template" "$target" && continue
     if [[ ! -w /etc/systemd/system ]] || ! touch "$target" 2>/dev/null; then
       warn "Systemd unit $unit is outdated; the next MNSCloud Agent update refreshes it."
       return 0

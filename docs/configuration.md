@@ -93,6 +93,9 @@ generated account domains arrive with `certificateProvider=wildcard`. Every sync
 3. renders one SNI server block per account domain using the wildcard certificate, or a temporary
    self-signed certificate until it exists.
 
+Issuance runs in `mnscloud-webrtc-acme.service` (started by the sync with `systemctl start
+--no-block`), not in the sync unit: Certbot may be the snap package, which cannot run under the sync
+unit's `NoNewPrivileges`/`ProtectHome`. After an issuance or renewal it re-renders Nginx and reloads it.
 Renewal reuses the stored hooks (`certbot renew`, deploy hook `systemctl reload nginx`); a sync
 renews when fewer than 30 days remain (`MNSCLOUD_ACME_RENEW_SECONDS`). A failed issuance waits one
 hour before the next attempt (`MNSCLOUD_ACME_RETRY_SECONDS`), because Let's Encrypt limits are shared
