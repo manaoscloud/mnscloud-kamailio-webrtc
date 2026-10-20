@@ -94,6 +94,8 @@ fi
 
 if [[ "$(realpath -m "$REPO_DIR")" != "$(realpath -m "$INSTALL_DIR")" ]]; then
   install_payload "$REPO_DIR"
+  prepare_letsencrypt_dirs
+  clear_wildcard_failures
   exec "$INSTALL_DIR/scripts/update-kamailio-webrtc.sh"
 fi
 

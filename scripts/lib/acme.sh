@@ -55,7 +55,7 @@ acme_api_call() {
 report_wildcard_certificate() {
   local base="$1" status="$2" expires="${3:-}" error="${4:-}" body output code
   body="$(jq -nc --arg base "$base" --arg status "$status" --arg expiresAt "$expires" --arg error "$error" \
-    '{base:$base,status:$status,expiresAt:($expiresAt|select(.!="")),error:($error|select(.!=""))}')"
+    '{base:$base,status:$status,expiresAt:(if $expiresAt == "" then null else $expiresAt end),error:(if $error == "" then null else $error end)}')"
   output="$(mktemp)"
   code="$(acme_api_call POST wildcard-certificates "$body" "$output" 2>/dev/null || true)"
   [[ "$code" == "200" ]] || warn "Wildcard certificate report for $base returned HTTP ${code:-none}."
@@ -86,6 +86,13 @@ ensure_wildcard_certificate() {
     warn "Wildcard certificate for *.$base failed recently; next attempt after $((ACME_RETRY_SECONDS - now + last_failure)) s."
     return 0
   fi
+  # The sync unit sees /etc read-only: the Let's Encrypt directories must exist before (an
+  # MNSCloud Agent update creates them). No failure marker: nothing was asked to Let's Encrypt.
+  if [[ ! -d /etc/letsencrypt || ! -w /etc/letsencrypt ]]; then
+    report_wildcard_certificate "$base" failed '' 'Let'"'"'s Encrypt directories are missing or read-only on the WebRTC edge; run the MNSCloud Agent update'
+    warn "Let's Encrypt directories are not writable here; the next MNSCloud Agent update prepares them."
+    return 0
+  fi
   if ! command -v certbot >/dev/null 2>&1; then
     report_wildcard_certificate "$base" failed '' 'certbot is not installed on the WebRTC edge'
     return 0
@@ -110,6 +117,17 @@ ensure_wildcard_certificate() {
   printf '%s\n' "$now" > "$failed_marker"
   report_wildcard_certificate "$base" failed '' "Let's Encrypt DNS-01 issuance failed for *.$base; see /var/log/letsencrypt on the edge."
   warn "Wildcard certificate *.$base could not be issued; account domains keep a temporary self-signed certificate."
+}
+
+# Unconfined runs (install, MNSCloud Agent update) prepare the Let's Encrypt state for the sync unit.
+prepare_letsencrypt_dirs() {
+  install -d -m 0755 /etc/letsencrypt /var/lib/letsencrypt /var/log/letsencrypt 2>/dev/null ||
+    warn "Could not prepare the Let's Encrypt directories (read-only context)."
+}
+
+# A new edge version may fix what made the last attempt fail: retry at once.
+clear_wildcard_failures() {
+  rm -f "$STATE_DIR"/acme/wildcard.*.failed 2>/dev/null || true
 }
 
 ensure_wildcard_certificates() {
