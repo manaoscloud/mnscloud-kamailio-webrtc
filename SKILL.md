@@ -59,7 +59,8 @@ bash -n scripts/rollback-kamailio-webrtc.sh
 bash -n scripts/uninstall-kamailio-webrtc.sh
 ```
 
-Commit and push completed changes to the corresponding GitHub repository.
+Commit completed changes on your task branch, push that branch and merge only through the
+workspace `scripts/ops/merge.sh`.
 
 
 ## Contribution Governance
