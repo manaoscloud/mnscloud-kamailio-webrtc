@@ -43,7 +43,7 @@ jobs:
             curl -fsSL -o /usr/share/keyrings/kamailio.asc.tmp https://deb.kamailio.org/kamailiodebkey.gpg
             gpg --batch --yes --dearmor -o /usr/share/keyrings/kamailio.gpg /usr/share/keyrings/kamailio.asc.tmp
             rm -f /usr/share/keyrings/kamailio.asc.tmp
-            printf "deb [signed-by=/usr/share/keyrings/kamailio.gpg] http://deb.kamailio.org/kamailio61 %s main\n" "$VERSION_CODENAME" \
+            printf "deb [signed-by=/usr/share/keyrings/kamailio.gpg] https://deb.kamailio.org/kamailio61 %s main\n" "$VERSION_CODENAME" \
               > /etc/apt/sources.list.d/kamailio.list
             apt-get update -y
 
